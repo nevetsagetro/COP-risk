@@ -140,8 +140,10 @@ Toda decisión que se acepte deberá registrarse en un ADR bajo
 
 ### Bloqueos restantes para la primera vertical
 
-- La fuente y licencia del dataset bloquean el contrato de datos, el esquema,
-  los tests de leakage y la definición del target.
+- La fuente y licencia del dataset bloquean instanciar el contrato para un
+  candidato, materializar un snapshot, definir el target concreto y ejecutar
+  tests de leakage. No bloquean definir previamente el metacontrato
+  metodológico.
 - Prefect está aceptado y su implementación está deliberadamente pospuesta; no
   bloquea el dominio ni el pipeline Python manual.
 - SQLite y filesystem local están aceptados para MLflow. Su implementación,
@@ -364,44 +366,44 @@ pendientes.
 Presentar una propuesta como aceptada, mezclar backend MLflow con feature
 storage o fijar gates arbitrarios antes de disponer de baseline.
 
-### Milestone 2: añadir configuración tipada y ampliar controles de calidad
+### Milestone 2: definir contrato de datos y protocolo de evaluación
 
 **Objetivo**
 
-Extender el paquete mínimo con configuración tipada y sus tests, sin entrenar
-modelos. El packaging y las herramientas de calidad básicos ya pertenecen al
-Milestone 0.
+Definir, sin seleccionar ni materializar datos, el metacontrato que todo
+dataset candidato deberá cumplir, un protocolo de evaluación sin leakage y una
+checklist de rechazo. La ejecución se registra en
+`docs/plans/0004-data-evaluation-contract.md`.
 
 **Archivos previstos**
 
-- `src/cop/config.py`
-- `tests/unit/test_config.py`
-- `.env.example`
-- `README.md`
-- `CHANGELOG.md`
+- `docs/data-contract.md`
+- `docs/evaluation-protocol.md`
+- `docs/dataset-acceptance-checklist.md`
+- `docs/plans/0004-data-evaluation-contract.md`
 
 **Comandos de validación**
 
 ```bash
-python3 -m pytest tests/unit
-python3 -m ruff check .
-python3 -m ruff format --check .
-python3 -m mypy src tests
+test -s docs/data-contract.md
+test -s docs/evaluation-protocol.md
+test -s docs/dataset-acceptance-checklist.md
 git diff --check
 ```
 
 **Criterio de aceptación**
 
-El entorno se instala de forma reproducible; configuración y secretos están
-separados; lint, formato, tipos y tests pasan; no se añaden dependencias sin
-justificación documentada.
+Cada término tiene definición operacional y evidencia futura; el protocolo
+preserva el test intacto frente a selección, HPO, early stopping, calibración,
+threshold y comparación iterativa; la checklist contiene rechazos explícitos;
+y fuente, target, features, métricas y umbrales siguen abiertos.
 
 **Riesgos**
 
-Sobrecargar dependencias antes de necesitarlas, asumir versiones incompatibles
-o filtrar secretos mediante defaults.
+Convertir el metacontrato en una selección implícita, aceptar reglas no
+verificables o gastar adaptativamente el test.
 
-### Milestone 3: implementar contrato y snapshot de datos permitido
+### Milestone 3: instanciar el contrato y materializar un snapshot permitido
 
 **Objetivo**
 
@@ -728,7 +730,8 @@ drift no promueve por sí mismo.
   aceptada o implementada.
 - [x] 2026-07-25: aprobación humana registrada para los cinco ADR del
   Milestone 1; las decisiones están Accepted y continúan sin implementación.
-- [ ] Milestone 2.
+- [x] 2026-07-25: Milestone 2 completado documentalmente mediante el ExecPlan
+  0004, sin seleccionar datos ni implementar código ML.
 - [ ] Milestone 3.
 - [ ] Milestone 4.
 - [ ] Milestone 5.
@@ -754,6 +757,9 @@ drift no promueve por sí mismo.
   implementa ninguna decisión.
 - 2026-07-25: `AGENTS.md` se reconcilia con los cinco ADR Accepted, separando
   decisiones, detalles operativos pendientes y tecnologías no implementadas.
+- 2026-07-25: el Milestone 2 define un metacontrato y protocolo de evaluación;
+  la instanciación para un dataset y el snapshot material permanecen en el
+  Milestone 3.
 
 ## Hallazgos inesperados
 
@@ -770,6 +776,7 @@ locales, configuración de agentes y un smoke test sin añadir funcionalidad de
 dominio. Los resultados y bloqueos de validación se mantienen en
 `docs/plans/0002-baseline-documental.md`.
 
-El Milestone 1 quedó cerrado documentalmente con cinco ADR Accepted. Los
-Milestones 2 a 9 continúan sin ejecutar. Las decisiones aceptadas no son
-capacidades existentes.
+El Milestone 1 quedó cerrado documentalmente con cinco ADR Accepted. El
+Milestone 2 añadió únicamente el contrato y protocolo metodológicos; no
+seleccionó datos ni implementó ML. Los Milestones 3 a 9 continúan sin ejecutar.
+Las decisiones aceptadas no son capacidades existentes.
