@@ -1,0 +1,65 @@
+# Secretos y configuración local
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Python, packaging y caches de herramientas
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+
+# Cobertura
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Datos locales; conservar documentación y placeholders
+data/**
+!data/**/
+!data/**/.gitkeep
+!data/**/README.md
+
+# Modelos y artefactos locales; conservar documentación y placeholders
+models/**
+!models/**/
+!models/**/.gitkeep
+!models/**/README.md
+artifacts/**
+!artifacts/**/
+!artifacts/**/.gitkeep
+!artifacts/**/README.md
+
+# MLflow local
+mlruns/
+.mlruns/
+mlflow.db
+
+# Notebooks
+.ipynb_checkpoints/
+
+# IDE y editores
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+Desktop.ini
