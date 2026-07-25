@@ -131,6 +131,9 @@ uno con `git diff --no-index --check /dev/null <archivo>`.
   CHANGELOG y roadmap, sin implementar las decisiones.
 - [x] 2026-07-25: revisión final read-only de la aceptación incorporada; sus
   hallazgos documentales se corrigieron o registraron como riesgo.
+- [x] 2026-07-25: `AGENTS.md` reconciliado con los cinco ADR Accepted;
+  decisiones, detalles operativos pendientes e implementación inexistente
+  quedaron separados.
 
 ## Hallazgos inesperados
 
@@ -142,12 +145,10 @@ uno con `git diff --no-index --check /dev/null <archivo>`.
 - El sandbox efectivo de reviewer puede no aplicar el modo read-only declarado;
   la revisión debe respetarlo operacionalmente y registrar cualquier
   discrepancia.
-- `AGENTS.md` continúa enumerando como pendientes Airflow/Prefect, metadata y
-  feature storage, y promoción/rollback. Los ADR 0001, 0003 y 0005 son
-  decisiones posteriores que resuelven parte de esas entradas, pero actualizar
-  la fuente normativa quedó fuera de los archivos autorizados en este cierre.
-  Hasta reconciliarla, futuros agentes deben leer los ADR Accepted junto con
-  `AGENTS.md`.
+- Antes de esta corrección, `AGENTS.md` enumeraba como pendientes
+  Airflow/Prefect, metadata y feature storage, y promoción/rollback aunque ADR
+  posteriores habían resuelto parte de esas entradas. La reconciliación
+  normativa eliminó esa contradicción sin afirmar implementación.
 
 ## Registro de decisiones del plan
 
@@ -159,6 +160,9 @@ uno con `git diff --no-index --check /dev/null <archivo>`.
   fuera del plan.
 - 2026-07-25: aprobación humana registrada; los cinco ADR pasan a Accepted y
   su implementación permanece aplazada a milestones posteriores.
+- 2026-07-25: `AGENTS.md` incorpora las cinco decisiones Accepted, conserva
+  pendientes solo detalles no resueltos y establece precedencia para ADR
+  Accepted posteriores.
 
 ## Resultados y retrospectiva
 
@@ -178,13 +182,14 @@ Resultados observados el 2026-07-25:
 - su único hallazgo, una línea vacía adicional al final de cada archivo nuevo,
   se corrigió y originó la comprobación explícita para archivos sin seguimiento;
 - el reviewer final de aceptación confirmó estados y checks; su hallazgo bajo
-  sobre referencias históricas se corrigió, y la contradicción normativa con
-  `AGENTS.md` quedó registrada como riesgo porque ese archivo estaba fuera del
-  alcance autorizado;
-- el estado Git final contiene solo README, CHANGELOG y roadmap modificados,
-  los cinco ADR y este plan, todos documentales.
+  sobre referencias históricas se corrigió;
+- una tarea documental posterior autorizó y completó la reconciliación de
+  `AGENTS.md` con los cinco ADR Accepted;
+- el estado Git de esta reconciliación contiene únicamente `AGENTS.md`, el
+  roadmap 0001 y este plan 0003 modificados.
 
 Las cinco propuestas fueron aceptadas documentalmente por aprobación humana,
 pero ninguna fue implementada. Dataset, target, features, métricas, thresholds,
-proveedor cloud, feature store y topología de Compose continúan abiertos. No
-se creó commit.
+proveedor cloud, feature store y topología de Compose continúan abiertos. La
+fuente normativa ya refleja esta separación. No se creó commit en esta
+corrección.

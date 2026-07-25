@@ -128,26 +128,26 @@ Toda decisión que se acepte deberá registrarse en un ADR bajo
    `PLANS.md` estaba vacío. El Milestone 0 resolvió esa tensión con una
    plantilla normativa; este roadmap conserva constancia de su origen
    provisional.
-2. Existe una estructura de carpetas amplia, pero casi todos los archivos están
-   vacíos y no hay commits. La estructura puede sugerir capacidades que no
-   existen y todavía no proporciona una base reproducible.
+2. Existe una estructura de carpetas amplia, pero muchos componentes siguen
+   vacíos. La estructura puede sugerir capacidades que no existen; el baseline
+   versionado solo demuestra documentación, packaging mínimo y smoke test.
 3. MLflow, Docker, FastAPI, Evidently y Grafana están aceptados, pero no existen
    dependencias, configuración ni servicios verificados. La aceptación de una
    tecnología no equivale a implementación.
-4. Se exige comparar challengers con un champion, pero aún no hay política
-   aceptada para crear el champion inicial, promover o hacer rollback.
+4. ADR 0005 ya acepta la política general challenger/champion, incluido el
+   bootstrap del primero y la intervención humana. Gates, autoridad concreta,
+   aliases e implementación siguen pendientes.
 
-### Decisiones que bloquean la primera vertical
+### Bloqueos restantes para la primera vertical
 
 - La fuente y licencia del dataset bloquean el contrato de datos, el esquema,
   los tests de leakage y la definición del target.
-- Prefect frente a Airflow bloquea solo la capa de orquestación; no debe bloquear
-  el dominio si los casos de uso se mantienen independientes del orquestador.
-- El almacenamiento local de MLflow, metadatos y artefactos debe definirse para
-  que los experimentos sean reproducibles. La elección cloud no bloquea una
-  demo estrictamente local.
-- La política de champion inicial, promoción y rollback bloquea cualquier
-  retraining de extremo a extremo.
+- Prefect está aceptado y su implementación está deliberadamente pospuesta; no
+  bloquea el dominio ni el pipeline Python manual.
+- SQLite y filesystem local están aceptados para MLflow. Su implementación,
+  configuración, backup y restore todavía bloquean tracking durable.
+- El lifecycle general está aceptado. Gates, autoridad, aliases, retención y
+  transiciones concretas todavía bloquean promoción y rollback end-to-end.
 - Los umbrales de drift bloquean alertas o triggers automáticos. No bloquean la
   generación de informes descriptivos sin acciones automáticas.
 - Falta decidir cómo versionar materialmente el dataset y cómo identificar cada
@@ -752,6 +752,8 @@ drift no promueve por sí mismo.
 - 2026-07-25: se aceptan Prefect diferido, local-first, SQLite/filesystem para
   MLflow, `uv.lock` diferido y lifecycle con promoción/rollback humanos; no se
   implementa ninguna decisión.
+- 2026-07-25: `AGENTS.md` se reconcilia con los cinco ADR Accepted, separando
+  decisiones, detalles operativos pendientes y tecnologías no implementadas.
 
 ## Hallazgos inesperados
 
