@@ -63,20 +63,35 @@ El baseline de desarrollo soporta Python 3.12 y usa `python3` como comando
 canónico. Las tecnologías enumeradas arriba están aceptadas para trabajo
 futuro, pero no se han añadido como dependencias ni se han implementado.
 
-## Decisiones pendientes
+Los ADR aceptados añaden estas decisiones documentales, todavía sin
+implementación:
 
-No se ha elegido todavía:
+- Prefect será el orquestador cuando exista un pipeline Python manual,
+  reproducible, probado e idempotente;
+- COP será local-first y Docker Compose se añadirá incrementalmente para
+  servicios concretos; cloud sigue fuera de alcance;
+- MLflow usará inicialmente SQLite para metadata y filesystem local para
+  artefactos, sin decidir feature store;
+- `uv.lock` será la estrategia de lock y se generará en un milestone posterior;
+- drift puede solicitar o iniciar challengers, pero promoción y rollback serán
+  humanos, comparativos y auditados.
+
+## Decisiones todavía pendientes
+
+Continúan sin decidir:
 
 - la fuente del dataset;
-- Airflow o Prefect como orquestador;
-- el proveedor cloud;
-- el almacenamiento de metadatos y features;
+- el proveedor cloud, que permanece fuera de alcance;
+- el feature store y el almacenamiento de features;
 - los umbrales de drift;
-- la estrategia de promoción y rollback de modelos.
+- el target y las features concretas;
+- las métricas finales, gates cuantitativos y autoridad/mecanismo de
+  aprobación;
+- la configuración completa de Docker Compose;
+- los detalles operativos de Prefect, MLflow, backup, retención y migración.
 
 Una decisión aceptada debe registrarse mediante un ADR bajo
-`docs/decisions/`. Las propuestas de los planes no cambian por sí solas el
-estado de una decisión.
+`docs/decisions/`. La aceptación documental no demuestra implementación.
 
 ## Desarrollo mínimo
 

@@ -17,6 +17,9 @@ Todos los cambios relevantes de este proyecto se documentarán en este archivo.
   artefactos locales.
 - Perfiles de agentes para coordinación, datos/ML, MLOps, monitoring y revisión
   de solo lectura.
+- ADR aceptados para Prefect diferido, ejecución local-first, persistencia
+  inicial de MLflow con SQLite y filesystem, estrategia `uv.lock` diferida y
+  lifecycle challenger/champion con promoción y rollback humanos.
 
 No se han añadido datos, modelos, entrenamiento, serving, monitoring,
-orquestación ni infraestructura funcional.
+orquestación, MLflow, uv, lock, Docker Compose ni infraestructura funcional.

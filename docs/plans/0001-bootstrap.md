@@ -69,20 +69,37 @@ Estas decisiones proceden de `AGENTS.md` y no son propuestas de este plan:
 - Evidently para monitorización de drift.
 - Grafana para visualización operacional.
 
+## Decisiones aceptadas por ADR
+
+El 2026-07-25 se aceptaron documentalmente:
+
+- Prefect como orquestador futuro, con implementación diferida hasta disponer
+  de un pipeline Python manual, reproducible, probado e idempotente.
+- Un enfoque local-first con Docker Compose incremental y cloud fuera de
+  alcance.
+- SQLite y filesystem local para metadata y artefactos iniciales de MLflow,
+  sin decidir feature store.
+- `uv.lock` como estrategia de lock, cuya implementación queda para un
+  milestone técnico posterior.
+- Un lifecycle donde drift puede solicitar o iniciar challengers, pero
+  promoción y rollback requieren acción humana, comparación y auditoría.
+
+Estas decisiones no demuestran implementación.
+
 ## Decisiones pendientes
 
 `AGENTS.md` exige no decidir silenciosamente:
 
 - fuente del dataset;
-- Airflow frente a Prefect;
 - proveedor cloud;
-- almacenamiento de metadatos y features;
+- almacenamiento de features y feature store;
 - umbrales de drift;
-- estrategia de promoción y rollback de modelos.
+- target, features, métricas y gates cuantitativos;
+- detalles operativos de aprobación, retención y rollback;
+- topología completa de Compose.
 
 Toda decisión que se acepte deberá registrarse en un ADR bajo
-`docs/decisions/`. Las recomendaciones de este documento no cambian aún su
-estado pendiente.
+`docs/decisions/`. La aceptación documental no demuestra implementación.
 
 ## Límites de seguridad, cumplimiento y corrección
 
@@ -171,8 +188,8 @@ Esta arquitectura es una propuesta, no estado existente:
    promovida y expone scoring de demostración y health check mediante Docker.
 7. **Monitorización local**: Evidently compara datos de referencia y actuales;
    publica métricas técnicas consumibles por Grafana, sin promover modelos.
-8. **Orquestación fina**: el orquestador que acepte un ADR futuro invoca casos
-   de uso del dominio sin contener lógica de negocio.
+8. **Orquestación fina**: Prefect, cuando se implemente conforme al ADR 0001,
+   invoca casos de uso del dominio sin contener lógica de negocio.
 9. **Control de retraining**: una señal de drift puede abrir o ejecutar un
    entrenamiento challenger; la promoción requiere un gate independiente,
    evidencia y rollback disponible.
@@ -187,16 +204,16 @@ Dependencias conceptuales:
 
 `señal de drift -> retraining challenger -> evaluación -> gate de promoción`
 
-## Recomendaciones sujetas a decisión
+## Decisiones y recomendaciones
 
 ### Prefect frente a Airflow
 
-**Criterios para decidir:** comparar operación local, scheduling, observabilidad,
-coste de mantenimiento, portabilidad y encaje con el objetivo del portfolio.
-La lógica de dominio debe seguir siendo invocable sin el orquestador elegido.
-Este roadmap no recomienda ni selecciona Airflow o Prefect.
+**Decisión aceptada:** Prefect será el orquestador cuando se introduzca
+orquestación. La lógica de dominio seguirá siendo invocable sin Prefect y su
+implementación se pospone hasta disponer de un pipeline Python manual,
+reproducible, probado e idempotente.
 
-**Estado:** pendiente hasta aprobar un ADR.
+**Estado:** Accepted en `docs/decisions/0001-orchestrator.md`; no implementado.
 
 ### Dataset público frente a sintético
 
@@ -215,7 +232,7 @@ adecuado mediante ADR.
 
 ### Almacenamiento de MLflow
 
-**Recomendación:** para una sola máquina, backend SQLite local y artefactos en
+**Decisión aceptada:** para una sola máquina, backend SQLite local y artefactos en
 filesystem local dentro de rutas persistentes ignoradas por Git. Separar desde
 el inicio las URI de backend y artefactos mediante configuración/variables de
 entorno. No usar el filesystem backend de MLflow como solución implícita de
@@ -224,12 +241,12 @@ metadatos.
 La migración a base de datos y object storage gestionados queda fuera del
 bootstrap y depende de proveedor cloud y requisitos multiusuario.
 
-**Estado:** propuesta de almacenamiento local; requiere ADR porque afecta al
-almacenamiento de metadatos.
+**Estado:** Accepted en `docs/decisions/0003-mlflow-persistence.md`; no
+implementado y sin decidir feature store.
 
 ### Retraining, promoción y rollback iniciales
 
-**Recomendación:**
+**Decisión aceptada:**
 
 - Retraining solo manual o bajo un comando explícito durante el bootstrap.
 - En una fase posterior, drift puede generar una solicitud o ejecución de
@@ -246,8 +263,9 @@ almacenamiento de metadatos.
 - Posponer umbrales numéricos hasta contar con baseline y documentarlos por
   separado; no inventarlos en el bootstrap.
 
-**Estado:** pendiente hasta aprobar ADR; especialmente los gates cuantitativos,
-la autoridad de aprobación y el mecanismo exacto de alias/rollback.
+**Estado:** Accepted en `docs/decisions/0005-model-lifecycle.md`; no
+implementado. Siguen pendientes gates cuantitativos, autoridad concreta y
+mecanismo exacto de alias/rollback.
 
 ## Estrategia de ejecución
 
@@ -310,37 +328,41 @@ demasiado amplias y ocultar archivos fuente.
 
 **Objetivo**
 
-Aceptar o rechazar explícitamente las propuestas necesarias para comenzar,
-incluyendo sus consecuencias y alternativas.
+Investigar y preparar propuestas separadas para las decisiones arquitectónicas
+iniciales y registrar cualquier aprobación humana posterior. La ejecución y
+aprobación documentales se mantienen en
+`docs/plans/0003-decisiones-arquitectonicas.md`.
 
 **Archivos previstos**
 
 - `docs/decisions/0001-orchestrator.md`
-- `docs/decisions/0002-bootstrap-dataset.md`
-- `docs/decisions/0003-local-mlflow-storage.md`
-- `docs/decisions/0004-model-lifecycle.md`
-- `docs/decisions/0005-data-versioning-and-local-storage.md`
+- `docs/decisions/0002-local-execution.md`
+- `docs/decisions/0003-mlflow-persistence.md`
+- `docs/decisions/0004-dependency-lock.md`
+- `docs/decisions/0005-model-lifecycle.md`
+- `docs/plans/0003-decisiones-arquitectonicas.md`
 
 **Comandos de validación**
 
 ```bash
 find docs/decisions -maxdepth 1 -type f -print | sort
-rg -n "^(#|Status:|Context:|Decision:|Consequences:)" docs/decisions
-rg -n "pending|proposed|accepted|rejected" docs/decisions
+rg -n "^- Status: Accepted$" docs/decisions
+! rg -n "^- Status: Proposed$" docs/decisions
 git diff --check
 ```
 
 **Criterio de aceptación**
 
-Cada ADR tiene estado explícito, contexto, decisión, alternativas y
-consecuencias. Están resueltos fuente inicial, orquestador, almacenamiento
-local, identificación/versionado de datos y ciclo inicial de modelo. Los
-umbrales numéricos pueden seguir pendientes si no se automatizan triggers.
+Cada ADR contiene contexto, requisitos, opciones, ventajas, inconvenientes,
+riesgos, coste operativo, decisión, consecuencias, reversibilidad y cuestiones
+abiertas. Tras aprobación humana, los cinco están Accepted; dataset, target,
+features, feature store, proveedor cloud, métricas y umbrales siguen
+pendientes.
 
 **Riesgos**
 
-Aceptar decisiones sin evidencia suficiente, mezclar dataset de bootstrap con
-dataset de evaluación o fijar gates arbitrarios antes de disponer de baseline.
+Presentar una propuesta como aceptada, mezclar backend MLflow con feature
+storage o fijar gates arbitrarios antes de disponer de baseline.
 
 ### Milestone 2: añadir configuración tipada y ampliar controles de calidad
 
@@ -701,7 +723,11 @@ drift no promueve por sí mismo.
 - [x] 2026-07-25: implementación del Milestone 0 mediante
   `docs/plans/0002-baseline-documental.md`; su validación y cierre se registran
   en ese plan específico.
-- [ ] Milestone 1.
+- [x] 2026-07-25: Milestone 1 documentado mediante cinco ADR Proposed y
+  `docs/plans/0003-decisiones-arquitectonicas.md`; ninguna propuesta fue
+  aceptada o implementada.
+- [x] 2026-07-25: aprobación humana registrada para los cinco ADR del
+  Milestone 1; las decisiones están Accepted y continúan sin implementación.
 - [ ] Milestone 2.
 - [ ] Milestone 3.
 - [ ] Milestone 4.
@@ -723,12 +749,17 @@ drift no promueve por sí mismo.
   ExecPlan 0002.
 - 2026-07-25: Airflow frente a Prefect continúa neutral y pendiente de ADR; el
   roadmap conserva únicamente criterios para una decisión futura.
+- 2026-07-25: se aceptan Prefect diferido, local-first, SQLite/filesystem para
+  MLflow, `uv.lock` diferido y lifecycle con promoción/rollback humanos; no se
+  implementa ninguna decisión.
 
 ## Hallazgos inesperados
 
 - El repositorio contiene muchos directorios con nombres de componentes, pero
   están vacíos. No deben tomarse como prueba de implementación.
-- No existe historia de Git desde la cual inferir decisiones o capacidades.
+- En la inspección inicial no existía historia Git. Desde el Milestone 0 existe
+  un baseline versionado en `04106f4`; las capacidades siguen verificándose en
+  el working tree, no se infieren del roadmap.
 
 ## Resultados y retrospectiva
 
@@ -737,5 +768,6 @@ locales, configuración de agentes y un smoke test sin añadir funcionalidad de
 dominio. Los resultados y bloqueos de validación se mantienen en
 `docs/plans/0002-baseline-documental.md`.
 
-Los Milestones 1 a 9 continúan sin ejecutar. Las propuestas que contienen no
-son capacidades existentes ni decisiones aceptadas.
+El Milestone 1 quedó cerrado documentalmente con cinco ADR Accepted. Los
+Milestones 2 a 9 continúan sin ejecutar. Las decisiones aceptadas no son
+capacidades existentes.
