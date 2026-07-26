@@ -21,13 +21,16 @@ El repositorio contiene únicamente un baseline de ingeniería:
 - una plantilla segura de variables de entorno;
 - exclusiones de Git para secretos y artefactos locales;
 - perfiles de agentes de desarrollo;
-- un smoke test que comprueba que `cop` puede importarse.
+- un smoke test que comprueba que `cop` puede importarse;
+- una decisión aceptada y especificación documental, todavía sin
+  implementación, para el bootstrap sintético.
 
-No hay dataset, EDA, pipeline de features, modelo, entrenamiento, experimento,
-API, imagen Docker funcional, servicio, orquestador, informe de drift,
-dashboard, retraining, base de datos ni infraestructura cloud implementados.
-Los directorios vacíos con nombres de componentes reservan estructura, pero no
-demuestran capacidades.
+No hay dataset aceptado, versionado o utilizable para entrenamiento, ni EDA,
+pipeline de features, modelo, entrenamiento, experimento, API, imagen Docker
+funcional, servicio, orquestador, informe de drift, dashboard, retraining, base
+de datos o infraestructura cloud implementados. El ZIP local de SFLLD fue
+rechazado y no contradice este estado. Los directorios vacíos con nombres de
+componentes reservan estructura, pero no demuestran capacidades.
 
 ## Visión y capacidades planificadas
 
@@ -74,17 +77,22 @@ implementación:
   artefactos, sin decidir feature store;
 - `uv.lock` será la estrategia de lock y se generará en un milestone posterior;
 - drift puede solicitar o iniciar challengers, pero promoción y rollback serán
-  humanos, comparativos y auditados.
+  humanos, comparativos y auditados;
+- datos sintéticos deterministas serán la fuente principal inicial; generador,
+  configuración, semillas y snapshots serán versionados, con Parquet, manifest,
+  hashes físicos/lógicos y `snapshot_as_of`.
 
 ## Decisiones todavía pendientes
 
 Continúan sin decidir:
 
-- la fuente del dataset;
+- la definición final del target, umbral DPD y horizonte;
+- población, estimand, tamaño, borrowers, solicitudes y prevalencia;
+- ventanas, distribuciones, correlaciones y escenarios exactos de drift;
 - el proveedor cloud, que permanece fuera de alcance;
 - el feature store y el almacenamiento de features;
+- las features concretas;
 - los umbrales de drift;
-- el target y las features concretas;
 - las métricas finales, gates cuantitativos y autoridad/mecanismo de
   aprobación;
 - la configuración completa de Docker Compose;

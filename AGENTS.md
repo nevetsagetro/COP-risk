@@ -47,6 +47,20 @@ deployment, or integration exists unless verified in the working tree.
 - Drift may request or start challenger training, but promotion and rollback
   require explicit human action, comparison with the champion, and an
   auditable record.
+- Deterministic synthetic data is the principal initial source for developing
+  and demonstrating the first complete vertical. The generator, configuration,
+  seeds, and snapshots are versioned; primary output is Parquet; manifests
+  contain physical and logical hashes; `snapshot_as_of` is part of snapshot
+  identity.
+- Synthetic targets are derived from a generated schedule/ledger. Immature,
+  absent, and censored labels remain unknown.
+- Splits respect time and `borrower_id`; the final test remains outside
+  selection, HPO, early stopping, calibration, and thresholds.
+- Protected attributes are physically separated as `audit_only` and never
+  inputs. Future real datasets must pass the same methodological, legal, and
+  quarantine gates.
+- Synthetic results do not support claims about real credit performance,
+  calibration, fairness, or usefulness.
 
 Accepted decisions do not prove implementation. A later ADR with
 `Status: Accepted` takes precedence over historical pending-decision lists in
@@ -67,11 +81,13 @@ Do not silently decide or implement:
 - the concrete promotion and rollback implementation;
 - backup, retention, restore, and migration procedures;
 - cloud provider;
-- dataset source and license;
-- target definition;
+- synthetic generator/snapshot license and publication terms;
+- final target definition and exact DPD threshold;
+- horizon, population, estimand, snapshot size, borrower/application counts,
+  prevalence, temporal windows, distributions, and correlations;
 - model features;
 - final model metrics and quantitative gates;
-- drift metrics, windows, and thresholds.
+- exact drift scenarios, metrics, windows, and thresholds.
 
 Record accepted decisions as ADRs under `docs/decisions/`.
 

@@ -20,6 +20,9 @@ Todos los cambios relevantes de este proyecto se documentarán en este archivo.
 - ADR aceptados para Prefect diferido, ejecución local-first, persistencia
   inicial de MLflow con SQLite y filesystem, estrategia `uv.lock` diferida y
   lifecycle challenger/champion con promoción y rollback humanos.
+- ADR aceptado y especificación documental para usar datos sintéticos
+  deterministas como fuente principal inicial, sin aceptar todavía target,
+  horizonte, población, tamaño, prevalencia, ventanas ni gates cuantitativos.
 
 No se han añadido datos, modelos, entrenamiento, serving, monitoring,
 orquestación, MLflow, uv, lock, Docker Compose ni infraestructura funcional.

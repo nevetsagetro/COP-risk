@@ -90,7 +90,8 @@ Estas decisiones no demuestran implementación.
 
 `AGENTS.md` exige no decidir silenciosamente:
 
-- fuente del dataset;
+- licencia/publicación del generador y snapshots sintéticos, y cualquier fuente
+  real futura;
 - proveedor cloud;
 - almacenamiento de features y feature store;
 - umbrales de drift;
@@ -140,10 +141,10 @@ Toda decisión que se acepte deberá registrarse en un ADR bajo
 
 ### Bloqueos restantes para la primera vertical
 
-- La fuente y licencia del dataset bloquean instanciar el contrato para un
-  candidato, materializar un snapshot, definir el target concreto y ejecutar
-  tests de leakage. No bloquean definir previamente el metacontrato
-  metodológico.
+- La fuente principal inicial ya está aceptada como sintética por ADR 0006. Su
+  licencia, implementación, parámetros, snapshot material y target concreto
+  todavía bloquean ejecutar tests de leakage y avanzar al split/baseline. Una
+  fuente real futura permanece sujeta al gate completo.
 - Prefect está aceptado y su implementación está deliberadamente pospuesta; no
   bloquea el dominio ni el pipeline Python manual.
 - SQLite y filesystem local están aceptados para MLflow. Su implementación,
@@ -219,18 +220,22 @@ reproducible, probado e idempotente.
 
 ### Dataset público frente a sintético
 
-**Recomendación:** comenzar con un dataset sintético determinista y versionado
-para el bootstrap y los tests de integración; evaluar en un milestone posterior
-un dataset público anonimizado con licencia, datasheet y revisión de atributos.
-Esto permite validar primero la ingeniería sin convertir procedencia o descarga
-externa en un bloqueo.
+**Decisión aceptada:** conforme al ADR 0006, comenzar con datos sintéticos
+deterministas y versionados como fuente principal inicial. La salida será
+Parquet; cada snapshot tendrá manifest, hashes físicos/lógicos y
+`snapshot_as_of`. El target se derivará de schedule/ledger, unknown se
+preservará, los splits respetarán tiempo y `borrower_id`, y el test quedará
+intacto.
 
 Un dataset sintético no sustenta afirmaciones de desempeño, calibración,
 fairness o utilidad en crédito real. Si el objetivo prioritario es demostrar
 evaluación modelística creíble, deberá aceptarse después un dataset público
 adecuado mediante ADR.
 
-**Estado:** la fuente sigue pendiente hasta aprobar un ADR.
+**Estado:** Accepted en `docs/decisions/0006-synthetic-data-bootstrap.md`; no
+implementado. Target, horizonte, población, estimand, tamaños, prevalencia,
+ventanas, distribuciones, correlaciones, drift exacto, thresholds y gates
+siguen pendientes.
 
 ### Almacenamiento de MLflow
 
@@ -446,9 +451,9 @@ antes de introducir LightGBM, resampling u optimización.
 
 **Precondición bloqueante**
 
-Este milestone no puede comenzar directamente desde una recomendación
-`Needs controlled inspection`. Antes debe existir una tarea separada y
-autorizada humanamente que:
+Para un dataset real, este milestone no puede comenzar directamente desde una
+recomendación documental. Antes debe existir una tarea separada y autorizada
+humanamente que:
 
 1. confirme términos y alcance de uso;
 2. designe responsable y cuarentena ignorada por Git;
@@ -459,7 +464,12 @@ autorizada humanamente que:
 6. obtenga aprobación humana de selección y el ADR que corresponda.
 
 Una adquisición controlada no equivale a aceptación. Sin superar íntegramente
-este gate no se crea código de split, baseline ni artefacto derivado.
+este gate no se usa ese dataset real para split, baseline ni artefacto derivado.
+
+Para el bootstrap sintético aceptado por ADR 0006, antes de crear split o
+baseline deberá implementarse y probarse el generador en un ExecPlan separado,
+aprobar los parámetros todavía pendientes, materializar un snapshot
+reproducible y aplicar el contrato y checklist sin rebajar sus gates.
 
 **Archivos previstos**
 
@@ -748,8 +758,13 @@ drift no promueve por sí mismo.
   completados mediante ExecPlan 0006; resultado `Reject` con la evidencia
   actual,
   sin aceptación para entrenamiento, split ni datos versionados.
+- [x] 2026-07-26: Milestones 4B y 4C cerraron la búsqueda real; ningún
+  candidato quedó aprobado o elegible para cuarentena.
+- [x] 2026-07-26: Milestone documental de bootstrap sintético completado en
+  ExecPlan 0009; ADR 0006 aceptado sin implementar generador ni fijar
+  parámetros pendientes.
 - [ ] Milestone 4: split y baseline, bloqueado hasta aceptación humana del
-  dataset y cierre de los requisitos pendientes del gate.
+  snapshot sintético material y cierre de los parámetros/requisitos del gate.
 - [ ] Milestone 5.
 - [ ] Milestone 6.
 - [ ] Milestone 7.
@@ -785,6 +800,9 @@ drift no promueve por sí mismo.
 - 2026-07-26: Milestone 4A registra e inspecciona el ZIP local en cuarentena;
   el resultado `Reject` no acepta el snapshot y mantiene
   bloqueados split y baseline.
+- 2026-07-26: se acepta ADR 0006 para bootstrap sintético determinista
+  principal; no se aceptan target, horizonte, población, tamaños, prevalencia,
+  ventanas, distribuciones, drift exacto, thresholds o gates.
 
 ## Hallazgos inesperados
 
@@ -801,9 +819,11 @@ locales, configuración de agentes y un smoke test sin añadir funcionalidad de
 dominio. Los resultados y bloqueos de validación se mantienen en
 `docs/plans/0002-baseline-documental.md`.
 
-El Milestone 1 quedó cerrado documentalmente con cinco ADR Accepted. El
+El Milestone 1 quedó cerrado documentalmente con cinco ADR Accepted. ADR 0006
+acepta después el bootstrap sintético estratégico, elevando el total a seis. El
 Milestone 2 añadió únicamente el contrato y protocolo metodológicos. El
 Milestone 3 comparó cuatro candidatos mediante fuentes primarias y dejó una
 recomendación condicional pendiente de aprobación humana; no seleccionó ni
-adquirió datos. Los Milestones 4 a 9 continúan sin ejecutar. Las decisiones
-aceptadas no son capacidades existentes.
+adquirió datos. Las búsquedas e inspección posteriores tampoco aprobaron datos
+reales. El generador, snapshot, split y Milestones técnicos 4 a 9 continúan sin
+ejecutar. Las decisiones aceptadas no son capacidades existentes.
