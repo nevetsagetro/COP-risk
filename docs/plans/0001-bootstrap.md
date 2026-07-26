@@ -4,7 +4,7 @@
 
 - Estado: roadmap general; no es el ExecPlan activo de implementación.
 - Fecha: 2026-07-25.
-- Última actualización: 2026-07-25.
+- Última actualización: 2026-07-26.
 - Alcance: preparar, mediante cambios pequeños, una primera vertical local y
   reproducible de COP.
 - Ejecución: cada milestone requiere un ExecPlan pequeño propio. El Milestone 0
@@ -403,46 +403,39 @@ y fuente, target, features, métricas y umbrales siguen abiertos.
 Convertir el metacontrato en una selección implícita, aceptar reglas no
 verificables o gastar adaptativamente el test.
 
-### Milestone 3: instanciar el contrato y materializar un snapshot permitido
+### Milestone 3: investigar y comparar datasets candidatos
 
 **Objetivo**
 
-Materializar únicamente la fuente aceptada en ADR, con generación o ingestión
-reproducible, validación de esquema y versionado, sin entrenamiento.
+Investigar fuentes primarias, aplicar documentalmente contrato y checklist, y
+proponer un candidato para una posible inspección futura. La ejecución se
+registra en `docs/plans/0005-dataset-research.md`. No se adquieren datos ni se
+acepta una fuente.
 
 **Archivos previstos**
 
-- `configs/data.yaml`
-- `src/cop/data/contracts.py`
-- `src/cop/data/load.py`
-- `scripts/prepare_data.py`
-- `tests/unit/data/`
-- `tests/integration/test_prepare_data.py`
-- documentación de procedencia/licencia o especificación del generador
-- `README.md`
-- `CHANGELOG.md`
+- `docs/dataset-candidates.md`
+- `docs/dataset-selection-rationale.md`
+- `docs/plans/0005-dataset-research.md`
 
 **Comandos de validación**
 
 ```bash
-python3 scripts/prepare_data.py --help
-python3 -m pytest tests/unit/data tests/integration/test_prepare_data.py
-python3 -m ruff check .
-python3 -m ruff format --check .
-python3 -m mypy src tests
+test -s docs/dataset-candidates.md
+test -s docs/dataset-selection-rationale.md
 git diff --check
 ```
 
 **Criterio de aceptación**
 
-El snapshot se reproduce y posee identificador de versión; esquema y target
-están documentados; no contiene PII real; atributos protegidos no son features
-de decisión; errores de contrato fallan de forma explícita.
+Al menos tres candidatos tienen fuentes primarias, hechos separados de
+inferencias y unknowns, resultado de checklist y motivos verificables. Existe
+una recomendación humana pendiente, sin dataset adquirido o Accepted.
 
 **Riesgos**
 
-Licencia no compatible, descarga no reproducible, PII inadvertida, proxies no
-identificados o target mal definido.
+Inferir permisos, anonimización o temporalidad; usar mirrors como autoridad; o
+presentar una recomendación como selección aceptada.
 
 ### Milestone 4: establecer split y baseline de evaluación
 
@@ -450,6 +443,23 @@ identificados o target mal definido.
 
 Crear el split determinista e intacto y una evaluación ingenua de referencia
 antes de introducir LightGBM, resampling u optimización.
+
+**Precondición bloqueante**
+
+Este milestone no puede comenzar directamente desde una recomendación
+`Needs controlled inspection`. Antes debe existir una tarea separada y
+autorizada humanamente que:
+
+1. confirme términos y alcance de uso;
+2. designe responsable y cuarentena ignorada por Git;
+3. adquiera una versión exacta sin publicarla;
+4. complete la fase B de la checklist sobre contenido, PII, temporalidad,
+   leakage, labels y reproducibilidad;
+5. registre ficheros, versión y hashes en un manifest;
+6. obtenga aprobación humana de selección y el ADR que corresponda.
+
+Una adquisición controlada no equivale a aceptación. Sin superar íntegramente
+este gate no se crea código de split, baseline ni artefacto derivado.
 
 **Archivos previstos**
 
@@ -732,7 +742,8 @@ drift no promueve por sí mismo.
   Milestone 1; las decisiones están Accepted y continúan sin implementación.
 - [x] 2026-07-25: Milestone 2 completado documentalmente mediante el ExecPlan
   0004, sin seleccionar datos ni implementar código ML.
-- [ ] Milestone 3.
+- [x] 2026-07-26: Milestone 3 completado documentalmente mediante el ExecPlan
+  0005; cuatro candidatos evaluados, ninguno adquirido o aceptado.
 - [ ] Milestone 4.
 - [ ] Milestone 5.
 - [ ] Milestone 6.
@@ -758,8 +769,14 @@ drift no promueve por sí mismo.
 - 2026-07-25: `AGENTS.md` se reconcilia con los cinco ADR Accepted, separando
   decisiones, detalles operativos pendientes y tecnologías no implementadas.
 - 2026-07-25: el Milestone 2 define un metacontrato y protocolo de evaluación;
-  la instanciación para un dataset y el snapshot material permanecen en el
-  Milestone 3.
+  la instanciación para un dataset y cualquier snapshot material permanecen
+  pendientes de una autorización humana posterior.
+- 2026-07-26: Freddie Mac SFLLD Sample queda recomendado únicamente como
+  `Needs controlled inspection`; los demás candidatos se rechazan y no se
+  crea ADR de selección.
+- 2026-07-26: se añade un gate bloqueante entre investigación y split:
+  términos, cuarentena, fase B, manifest y selección humana deben completarse
+  en una tarea futura separada.
 
 ## Hallazgos inesperados
 
@@ -777,6 +794,8 @@ dominio. Los resultados y bloqueos de validación se mantienen en
 `docs/plans/0002-baseline-documental.md`.
 
 El Milestone 1 quedó cerrado documentalmente con cinco ADR Accepted. El
-Milestone 2 añadió únicamente el contrato y protocolo metodológicos; no
-seleccionó datos ni implementó ML. Los Milestones 3 a 9 continúan sin ejecutar.
-Las decisiones aceptadas no son capacidades existentes.
+Milestone 2 añadió únicamente el contrato y protocolo metodológicos. El
+Milestone 3 comparó cuatro candidatos mediante fuentes primarias y dejó una
+recomendación condicional pendiente de aprobación humana; no seleccionó ni
+adquirió datos. Los Milestones 4 a 9 continúan sin ejecutar. Las decisiones
+aceptadas no son capacidades existentes.
