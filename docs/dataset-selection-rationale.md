@@ -1,88 +1,83 @@
 # Rationale de selección documental
 
-## Decisión actual
+## Decisión final de búsqueda real
 
-No existe ningún dataset seleccionado o aprobado para entrenamiento. La
-segunda búsqueda de Milestone 4B no identifica un candidato elegible:
+Milestone 4C cierra la tercera y última búsqueda dirigida. Se evaluaron
+exactamente tres candidatos:
 
 | Candidato | Resultado |
 |---|---|
-| Home Credit — Credit Risk Model Stability | **Needs clarification** |
-| Home Credit Default Risk | **Reject** |
-| UCI Polish Companies Bankruptcy | **Reject** |
+| PKDD’99 Czech Financial Dataset | **Needs clarification** |
+| Kiva public loan/repayment data | **Reject** |
+| LendingClub historical loan performance | **Reject** |
 
-Freddie Mac SFLLD Sample 2019 permanece **Reject** tras Milestone 4A. No se
-reinterpreta como aceptación parcial ni recomendación.
+Ninguno es `Eligible for quarantine inspection`. La búsqueda real se detiene;
+no se descargan datos ni se abre otra ronda.
 
-## Criterio decisivo
+Resultados anteriores no cambian: SFLLD permanece `Reject`; Home Credit Model
+Stability permanece `Needs clarification`; los demás candidatos conservan sus
+clasificaciones documentadas.
 
-El gate exige términos compatibles con un portfolio público, target/horizonte
-operacionales, unidad/entidad/decisión verificables, tiempo para un test
-intacto, control de leakage, segregación de atributos protegidos y
-post-outcome, madurez/censura y monitoring plausible.
+## Motivos
 
-Licencia clara no compensa ausencia de tiempo o entidad. Temporalidad
-prometedora no compensa términos o target ambiguos.
+### PKDD’99 Czech Financial Dataset
 
-## Candidato que requiere aclaración
+Es el mejor encaje estructural de esta ronda: tablas relacionales de clientes,
+cuentas, préstamos y transacciones, IDs, fechas, pagos y outcome. Permitiría
+separar hechos as-of de transacciones posteriores y plantear un split temporal.
 
-### Home Credit — Credit Risk Model Stability
+No entra en cuarentena porque el [repositorio histórico VŠE](https://sorry.vse.cz/~berka/challenge/pkdd1999/berka.htm)
+no aporta licencia explícita, términos de publicación, snapshot versionado o
+hash recuperable. “Problemas de pago” tampoco define default/horizonte con la
+precisión contractual. `Needs clarification` es triage, no aprobación parcial.
 
-Es el candidato metodológicamente más prometedor porque la
-[descripción oficial](https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability/data)
-incluye caso, fecha de decisión, semanas y tablas históricas. Podría soportar
-cohortes, split temporal y monitoring.
+### Kiva
 
-No es elegible. Antes de descargar deben verificarse en las
-[reglas oficiales](https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability/rules),
-sin aceptarlas durante esta tarea:
+**Reject.** Kiva ofrece IDs, fechas, repayment schedules y repagos, y sus
+[Terms](https://www.kiva.org/legal/terms) describen una regla orientativa de
+default. Sin embargo, restringen automatización y contenido y prohíben publicar
+borrower delinquency/default individual. El permiso para métricas agregadas y
+modelos es unknown bloqueante, no autorización inferida. Además, partners,
+extensiones y reporting hacen target/censura no uniformes.
 
-1. opción exacta de uso de Competition Data;
-2. permiso para portfolio externo no comercial;
-3. publicación de código, métricas, gráficos y documentación;
-4. publicación/distribución de modelos y parámetros;
-5. prohibición y alcance de redistribución;
-6. target, horizonte, madurez y censura operacionales;
-7. cliente estable y disponibilidad as-of de cada tabla.
+### LendingClub
 
-Cualquier ambigüedad mantiene bloqueada la cuarentena. Aclarar no equivale a
-aceptar reglas o seleccionar el dataset.
+**Reject.** Los [Terms oficiales](https://www.lendingclub.com/apply/auto/legal-agreement/TermsOfUse)
+limitan contenido al uso propio y prohíben republicar, redistribuir o
+incorporarlo a otra base. La oferta actual no aporta un snapshot histórico
+público, versionado y licenciado que una originación con pagos/outcome. Copias
+de Kaggle o terceros no sustituyen esa ausencia.
 
-## Candidatos rechazados
+## Recomendación formal posterior
 
-### Home Credit Default Risk
+Se recomienda **datos sintéticos deterministas como bootstrap principal**.
+Debe existir un contrato explícito que genere:
 
-**Reject.** El [diccionario oficial](https://www.kaggle.com/competitions/home-credit-default-risk/data)
-define dificultades de pago mediante constantes `X`/`Y` ocultas y no publica
-fecha calendario de decisión por solicitud. Los offsets no ordenan cohortes.
-No se puede reproducir target/horizonte, reservar test temporal o demostrar
-madurez. Las reglas también requieren aclaración, pero eso no subsana los
-fallos duros.
+- entidades y préstamos repetidos con IDs;
+- decisiones y disponibilidad as-of;
+- repayment schedules, outcomes, madurez y censura;
+- cohortes temporales con cambios controlados;
+- atributos de auditoría separados de inputs;
+- escenarios reproducibles de drift y retraining.
 
-### UCI Polish Companies Bankruptcy
+Este enfoque permite construir y probar el pipeline manual, leakage controls,
+split temporal, monitoring y lifecycle sin PII ni restricciones de
+redistribución. No sustenta claims de desempeño, calibración, fairness o
+utilidad sobre crédito real.
 
-**Reject.** La [ficha UCI](https://archive.ics.uci.edu/dataset/365/polish+companies+bankruptcy)
-ofrece bancarrota, horizontes de uno a cinco años y CC BY 4.0, compatible con
-publicación y redistribución atribuida de datos/adaptaciones. El tratamiento de
-un modelo entrenado requiere revisión específica. No publica ID de empresa ni
-timestamp por fila, por lo que no puede controlarse solape entre casos, corte
-as-of, censura o un test temporal intacto.
+Como variante híbrida futura, un dataset real solo podría usarse para baseline
+descriptivo/modelístico después de superar contrato, checklist, cuarentena y
+aceptación humana. Los datos sintéticos seguirían reservados para escenarios
+controlados de drift/retraining. Hoy ningún candidato real está autorizado
+para esa capa; Home Credit Model Stability y PKDD’99 solo pueden reabrirse si
+se resuelven documentalmente sus bloqueos.
 
-## Publicación del portfolio
+## Consecuencias
 
-Para Home Credit no se infieren permisos de notebooks, soluciones o mirrors:
-solo reglas específicas pueden autorizar outputs. Para Polish, CC BY 4.0
-permite compartir/adaptar con atribución, pero no aporta aptitud metodológica.
-
-Datos crudos futuros permanecerían ignorados salvo permiso expreso. Código,
-métricas y modelos se revisarían separadamente porque las reglas pueden
-tratarlos de modo distinto.
-
-## Próximo paso permitido
-
-Solicitar aclaración documental humana sobre Credit Risk Model Stability,
-conservando evidencia fechada de reglas sin aceptarlas ni descargar datos. Si
-términos, outputs o target siguen ambiguos, el candidato pasa a `Reject`.
-
-No procede ingesta, datos sintéticos, features, splits o entrenamiento. No se
-crea ADR porque no se acepta una fuente.
+- No se crea ADR ni se selecciona fuente en este milestone.
+- No se implementa todavía generador sintético, ingesta, split o modelo.
+- El próximo milestone deberá proponer el contrato y alcance del bootstrap
+  sintético/híbrido, y cualquier aceptación humana deberá registrarse
+  separadamente.
+- La evidencia real revisada puede informar limitaciones y diseño, pero no se
+  mezcla con datos sintéticos ni se presenta como dataset aprobado.

@@ -3,7 +3,7 @@
 ## Estado y método
 
 Investigación exclusivamente documental iniciada el **2026-07-26** y ampliada
-el mismo día mediante Milestone 4B. No se
+el mismo día mediante Milestones 4B y 4C. No se
 descargaron archivos, no se usaron APIs, no se inspeccionaron filas, no se
 aceptaron términos y no se creó ningún dataset o snapshot.
 
@@ -545,3 +545,199 @@ Ninguno es `Eligible for quarantine inspection`. Credit Risk Model Stability
 justifica una aclaración humana limitada, pero no puede descargarse mientras
 términos, publicación y target sean ambiguos. Los otros dos se rechazan por
 fallos metodológicos. SFLLD conserva **Reject** sin reinterpretación.
+
+## Tercera y última búsqueda dirigida — Milestone 4C
+
+Consulta documental: 2026-07-26. Se aplicó la regla de parada tras exactamente
+tres candidatos. No se abrieron endpoints de descarga, aceptaron términos,
+crearon cuentas o consultaron mirrors como evidencia.
+
+## 8. PKDD’99 Czech Financial Dataset
+
+### Fuentes primarias
+
+- [Repositorio histórico del autor en VŠE](https://sorry.vse.cz/~berka/challenge/pkdd1999/berka.htm)
+- [PKDD’99 Proceedings](https://doi.org/10.1007/b72280)
+- `Guide to the Financial Data Set`, Petr Berka, workshop notes del
+  Discovery Challenge PKDD’99 (referenciado por el repositorio histórico)
+
+### Propiedad, repositorio, paper y licencia
+
+**FACT:** Petr Berka y Marta Sochorova prepararon para el Discovery Challenge
+de PKDD’99 una base relacional anonimizada de un banco checo. El repositorio
+histórico de la Prague University of Economics and Business (VŠE) documenta el
+challenge; las actas oficiales de PKDD’99 documentan la conferencia y los
+trabajos asociados.
+
+**FACT:** la distribución histórica se describe mediante ficheros `ACCOUNT`,
+`CLIENT`, `DISP`, `CARD`, `ORDER`, `TRANS`, `LOAN` y `DISTRICT`. Las claves
+enlazan clientes con cuentas, préstamos y transacciones. `LOAN` contiene fecha,
+importe, duración, pagos y status; `TRANS` contiene movimientos fechados.
+
+**UNKNOWN bloqueante:** no se encontró una licencia explícita aplicable a los
+datos ni términos que autoricen portfolio público, código, métricas, modelos o
+redistribución. Las actas tienen copyright editorial, pero eso no licencia el
+dataset. La URL histórica no ofrece hoy un snapshot versionado, hash o
+procedimiento estable de recuperación. No existe un paper de dataset con
+licencia independiente; el guide es documentación de workshop.
+
+### Contrato y evaluación
+
+**FACT:** la unidad candidata es un préstamo y existe loan ID. La entidad puede
+reconstruirse mediante account/disp/client IDs; cuentas con varios titulares y
+clientes con varias disposiciones requieren una regla de entidad. Hay fecha de
+cuenta, fecha de préstamo, duración, pago periódico, transacciones fechadas y
+status de préstamo.
+
+**FACT:** los status distinguen préstamos terminados y en curso, con/sin
+problemas de pago. Un estado terminado reduce el riesgo de censura
+administrativa y uno activo señala cobertura incompleta al cutoff del extracto,
+pero ninguno demuestra madurez del target sin regla adicional.
+
+**UNKNOWN:** “problemas de pago” no aporta una definición operacional de
+default, días de mora o fecha exacta del outcome. Tampoco se documentan
+`label_observed_at`, cutoff/snapshot, timezone o calendario.
+
+**RISK:** transacciones posteriores a la fecha del préstamo, saldos futuros y
+el propio status son post-decision. Un join sin corte as-of filtra outcome.
+Repeticiones por cliente/cuenta exigen agrupación antes del split.
+
+**INFERENCE:** fechas de 1993–1998 permitirían en principio ventanas temporales
+y un test posterior, aunque la muestra de solo 682 préstamos puede ser
+insuficiente para train/validation/calibration/test y monitoring estable. La
+temporalidad soporta una simulación histórica limitada, no drift contemporáneo.
+
+**Resultado: Needs clarification.** El esquema cumple gran parte del contrato,
+pero licencia, términos de publicación, definición de default y adquisición
+reproducible deben resolverse antes de cuarentena.
+
+## 9. Kiva public loan data and repayment history
+
+### Fuentes primarias
+
+- [Presentación oficial de Kiva API](https://www.kiva.org/blog/introducing-the-kiva-api)
+- [Anuncio oficial de Data Snapshots](https://www.kiva.org/blog/data-by-the-gigabyte)
+- [Kiva Terms of Use, 8 octubre 2025](https://www.kiva.org/legal/terms)
+- [Guía oficial para Lending Partners](https://cms.kiva.org.s3.amazonaws.com/files/Guide_to_Kiva_for_Potential_Partners_2017_EN.pdf)
+
+### Propiedad, archivos, paper y licencia
+
+**FACT:** Kiva Microfunds es propietario del Website/API y anunció API pública
+sin registro y snapshots diarios en formatos estructurados. La documentación
+describe loan ID, borrower/partner, posting/disbursal/funding, importe,
+actividad, repayment schedule y estados/repagos. No se identificó un paper
+original que licencie el dataset; las fuentes normativas son Kiva.
+
+**FACT:** los Terms vigentes permiten usar el Website solo de forma personal y
+no comercial vinculada al programa. Kiva conserva derechos sobre el contenido;
+sin permiso escrito no permite modificar, publicar, distribuir, mostrar
+públicamente o reutilizar el contenido. También prohíbe scripts/bots y compartir
+públicamente morosidad o default de un borrower.
+
+**UNKNOWN bloqueante:** los Terms no definen inequívocamente si métricas
+agregadas o modelos derivados pueden publicarse. Código independiente podría
+ser publicable, pero no código que automatice acceso prohibido ni outputs que
+revelen contenido restringido. Que una API fuese “open” en 2009 no equivale a
+licencia abierta bajo los términos 2025.
+
+### Contrato y evaluación
+
+**FACT:** una observación puede ser un loan con loan ID. Kiva registra
+disbursal, calendario de pagos y repagos recibidos; algunos loans son directos
+y otros son gestionados por Lending Partners. Los partners pueden predesembolsar
+y reportan repagos con distintos retrasos.
+
+**FACT:** Kiva generalmente considera default cuando la recuperación es dudosa
+o el acumulado repagado queda por debajo de lo esperado desde seis meses a un
+año, pero admite decisiones caso por caso, restructuración y extensión.
+
+**UNKNOWN:** no se demuestra borrower/entity ID estable y publicable entre
+loans. El outcome puede mezclar riesgo de borrower, partner, país, regulación,
+moneda y reporting. Madurez, censura, extensiones y `label_observed_at` deben
+reconstruirse; el target no tiene horizonte uniforme.
+
+**RISK:** repayment history, delinquency/default, amounts repaid y partner
+outcomes son post-decision. Descripciones, nombres, fotos, género, ubicación y
+actividad contienen PII/atributos protegidos/proxies y contenido que Kiva puede
+retirar. Un split temporal sería técnicamente posible con fechas, pero no
+resuelve términos, entidad o cambios de reporting/partner.
+
+**Resultado: Reject.** Los términos restringen expresamente automatización,
+contenido y publicación de delinquency/default individual, y no existe licencia
+explícita compatible. Métricas agregadas y modelos quedan unknown bloqueante,
+no permiso inferido.
+
+## 10. LendingClub historical loan performance
+
+### Fuentes primarias
+
+- [LendingClub Terms of Use](https://www.lendingclub.com/apply/auto/legal-agreement/TermsOfUse)
+- [Investor API Terms](https://www.lendingclub.com/info/investor-api-agreement.action)
+- [Developer API FAQ](https://www.lendingclub.com/developers/api-faq)
+- [Documentación técnica LCX Primary Market](https://www.lendingclub.com/institutional-investing/lcxpm-api/lcxpm-listings)
+- [LendingClub 2025 Form 10-K](https://www.sec.gov/Archives/edgar/data/1409970/000140997026000018/lc-20251231.htm)
+
+### Propiedad, archivos, paper y licencia
+
+**FACT:** LendingClub Corporation/LendingClub Bank son la fuente oficial. La
+documentación actual ofrece APIs para usuarios/inversores elegibles y listings,
+no un repositorio académico versionado de historical accepted loans con
+licencia abierta. No se identificó un paper original que publique o licencie
+ese dataset histórico.
+
+**FACT:** los Terms conceden una licencia limitada para uso propio relacionado
+con el servicio. Prohíben modificar, copiar, redistribuir, republicar,
+incorporar a otra base, scraping y usos no autorizados. La API requiere aceptar
+términos, cuenta elegible y limita el uso a propósitos definidos que no
+compitan con LendingClub.
+
+**INFERENCE:** no existe permiso verificable para redistribuir datos o publicar
+un modelo/metrics derivados como portfolio. Código genérico podría ser
+independiente, pero adquisición automatizada y publicación de outputs
+necesitarían autorización escrita.
+
+### Contrato y evaluación
+
+**FACT:** los productos son préstamos amortizables con solicitud, plazo,
+pagos y servicing. La documentación de listings incluye atributos de
+aplicación y loan/order history, pero las fuentes actuales no ofrecen un
+snapshot público reproducible con loan ID, borrower/entity ID, originación y
+performance histórica completa.
+
+**UNKNOWN:** definición concreta de default/charge-off, horizonte uniforme,
+censura, fechas de pagos/outcome, disponibilidad as-of, esquema histórico y
+continuidad del antiguo download. Tampoco se demuestra un ID estable de persona
+entre loans.
+
+**RISK:** `loan_status`, recoveries, total payments, last payment y collection
+fields son post-outcome. Aplicaciones repetidas y datos crediticios enlazables
+crean entity/PII risks. Sin artefacto oficial/licenciado no puede probarse un
+split temporal, aunque versiones históricas de terceros incluyan fechas.
+
+**Resultado: Reject.** Los términos oficiales son incompatibles con
+republicación/compilación y no existe una adquisición oficial reproducible y
+licenciada para el artefacto buscado.
+
+## Comparación y regla de parada de Milestone 4C
+
+| Dimensión | PKDD’99 Czech | Kiva | LendingClub |
+|---|---|---|---|
+| Propietario | Banco anónimo; Berka/Sochorova/VŠE | Kiva Microfunds | LendingClub Corp./Bank |
+| Repositorio oficial | Histórico VŠE, disponibilidad frágil | API/snapshots Kiva | APIs/website actuales |
+| Paper/guía | Guide PKDD’99 | Sin paper de licencia | Sin paper de dataset |
+| Licencia de datos | Unknown bloqueante | Terms restrictivos | Terms restrictivos |
+| Archivos | 8 tablas relacionales documentadas | API/snapshots estructurados | Sin historical snapshot abierto actual |
+| Loan ID | Sí | Sí | En APIs/listings; snapshot unknown |
+| Entity ID | Client/account, regla pendiente | Unknown/publicabilidad dudosa | Unknown |
+| Decisión/originación | Loan date | Disbursal/posting | Aplicación/originación, artefacto absent |
+| Pagos/outcome | Transactions + status | Schedule/repayments/default | No snapshot oficial verificable |
+| Default/horizonte | Problemas de pago; incompleto | Caso por caso, 6–12 meses orientativos | Unknown para artefacto |
+| Censura | Status activos | Extensiones/partner/reporting | Unknown |
+| Split temporal | Potencial limitado | Técnicamente potencial | No demostrable |
+| Publicar código/métricas/modelo | Unknown | Código automatizado/labels restringidos; métricas/modelo unknown | Incompatible sin permiso |
+| Redistribución | Unknown | Prohibida sin permiso | Prohibida |
+| Adquisición reproducible | No demostrada | Endpoint/snapshot cambiante | No |
+| Resultado | **Needs clarification** | **Reject** | **Reject** |
+
+Ninguno es `Eligible for quarantine inspection`. Se detiene la búsqueda real
+tras el tercer candidato, sin modificar resultados anteriores.
