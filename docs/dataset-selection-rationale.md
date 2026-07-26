@@ -2,129 +2,87 @@
 
 ## Decisión actual
 
-No se selecciona ni acepta un dataset. La decisión humana continúa pendiente.
-La investigación del 2026-07-26 recomienda avanzar únicamente con la revisión
-humana previa a una posible inspección en cuarentena del **Freddie Mac
-Single-Family Loan-Level Dataset Sample**.
+No existe ningún dataset seleccionado o aprobado para entrenamiento. La
+segunda búsqueda de Milestone 4B no identifica un candidato elegible:
 
-Su estado es **Needs controlled inspection**, no `Eligible` ni `Accepted`.
-No se autoriza descarga, registro, aceptación de términos o creación de
-cuarentena mediante este documento.
+| Candidato | Resultado |
+|---|---|
+| Home Credit — Credit Risk Model Stability | **Needs clarification** |
+| Home Credit Default Risk | **Reject** |
+| UCI Polish Companies Bankruptcy | **Reject** |
 
-## Criterios aplicados
+Freddie Mac SFLLD Sample 2019 permanece **Reject** tras Milestone 4A. No se
+reinterpreta como aceptación parcial ni recomendación.
 
-Se aplicaron el contrato, protocolo y fase A de la checklist vigentes:
+## Criterio decisivo
 
-- procedencia y términos verificables;
-- unidad, IDs y temporalidad documentados;
-- posibilidad de preservar un test temporal;
-- reconstrucción de labels maduras y censura;
-- segregación de información post-decision;
-- protección de PII y atributos sensibles;
-- snapshots y monitoring futuro;
-- compatibilidad del uso con un portfolio público no comercial.
+El gate exige términos compatibles con un portfolio público, target/horizonte
+operacionales, unidad/entidad/decisión verificables, tiempo para un test
+intacto, control de leakage, segregación de atributos protegidos y
+post-outcome, madurez/censura y monitoring plausible.
 
-Un dataset manejable o con licencia permisiva no compensa la ausencia de
-timestamps, entity control o madurez.
+Licencia clara no compensa ausencia de tiempo o entidad. Temporalidad
+prometedora no compensa términos o target ambiguos.
 
-## Candidato recomendado para futura inspección en cuarentena
+## Candidato que requiere aclaración
 
-### Freddie Mac SFLLD Sample
+### Home Credit — Credit Risk Model Stability
 
-Se recomienda como siguiente candidato porque su
-[página oficial](https://www.freddiemac.com/research/datasets/sf-loanlevel-dataset)
-y [User Guide](https://www.freddiemac.com/research/pdf/user_guide.pdf)
-documentan originación, loan ID, performance mensual, cutoffs, masking y un
-sample oficial. Sus
-[términos versionados, efectivos desde noviembre de 2025](https://capitalmarkets.freddiemac.com/crt/docs/pdfs/fre_terms_conditions_sflld.pdf)
-contemplan investigación y resultados públicos no comerciales con límites de
-redistribución, reconstrucción y reidentificación.
+Es el candidato metodológicamente más prometedor porque la
+[descripción oficial](https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability/data)
+incluye caso, fecha de decisión, semanas y tablas históricas. Podría soportar
+cohortes, split temporal y monitoring.
 
-La recomendación es condicional porque aún debe decidirse humanamente:
+No es elegible. Antes de descargar deben verificarse en las
+[reglas oficiales](https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability/rules),
+sin aceptarlas durante esta tarea:
 
-1. si COP y todos sus outputs públicos encajan en el uso no comercial
-   permitido;
-2. quién aceptaría y conservaría la versión exacta de los términos;
-3. qué resultados y artefactos podrían publicarse sin reconstruir los datos;
-4. quién sería responsable de la cuarentena, acceso, retención y eliminación;
-5. qué release/sample acotado se solicitaría;
-6. si el proyecto estudiará originación o préstamo-mes;
-7. qué target, horizonte y eventos competidores propondrá después.
+1. opción exacta de uso de Competition Data;
+2. permiso para portfolio externo no comercial;
+3. publicación de código, métricas, gráficos y documentación;
+4. publicación/distribución de modelos y parámetros;
+5. prohibición y alcance de redistribución;
+6. target, horizonte, madurez y censura operacionales;
+7. cliente estable y disponibilidad as-of de cada tabla.
 
-Hasta resolver los puntos 1–4 no se supera la fase A y no debe adquirirse.
+Cualquier ambigüedad mantiene bloqueada la cuarentena. Aclarar no equivale a
+aceptar reglas o seleccionar el dataset.
 
 ## Candidatos rechazados
 
-### UCI Default of Credit Card Clients
+### Home Credit Default Risk
 
-**Reject.** Aunque UCI publica CC BY 4.0, 30.000 instancias y un diccionario,
-no documenta timestamps por observación, availability del cutoff, madurez,
-censura ni cohortes temporales para reservar un test futuro.
-[Fuente UCI](https://archive.ics.uci.edu/dataset/350/default).
+**Reject.** El [diccionario oficial](https://www.kaggle.com/competitions/home-credit-default-risk/data)
+define dificultades de pago mediante constantes `X`/`Y` ocultas y no publica
+fecha calendario de decisión por solicitud. Los offsets no ordenan cohortes.
+No se puede reproducir target/horizonte, reservar test temporal o demostrar
+madurez. Las reglas también requieren aclaración, pero eso no subsana los
+fallos duros.
 
-La discrepancia entre las 30.000 instancias de UCI y las 25.000 declaradas en
-la sección de datos del [paper original](https://www.sciencedirect.com/science/article/pii/S0957417407006719)
-añade una cuestión de versionado. Sexo sería `audit_only/prohibited` y otros
-demográficos son proxies potenciales.
+### UCI Polish Companies Bankruptcy
 
-### UCI South German Credit
+**Reject.** La [ficha UCI](https://archive.ics.uci.edu/dataset/365/polish+companies+bankruptcy)
+ofrece bancarrota, horizontes de uno a cinco años y CC BY 4.0, compatible con
+publicación y redistribución atribuida de datos/adaptaciones. El tratamiento de
+un modelo entrenado requiere revisión específica. No publica ID de empresa ni
+timestamp por fila, por lo que no puede controlarse solape entre casos, corte
+as-of, censura o un test temporal intacto.
 
-**Reject.** La
-[fuente UCI canónica](https://archive.ics.uci.edu/dataset/573/south+german+credit+update)
-y el [informe de corrección](https://www1.bht-berlin.de/FB_II/reports/Report-2019-004.pdf)
-documentan 1.000 créditos de 1973–1975 y sobremuestreo de bad credits. No hay
-IDs o fechas por fila, horizonte operacional ni madurez verificable. La
-prevalencia enriquecida y el sesgo por aprobación invalidan una demostración
-simple de calibración o generalización.
+## Publicación del portfolio
 
-### Fannie Mae Single-Family Loan Performance Data
+Para Home Credit no se infieren permisos de notebooks, soluciones o mirrors:
+solo reglas específicas pueden autorizar outputs. Para Polish, CC BY 4.0
+permite compartir/adaptar con atribución, pero no aporta aptitud metodológica.
 
-**Reject** bajo los términos publicados. La estructura longitudinal sería útil,
-pero el [Legal Disclosure](https://www.fanniemae.com/about-us/legal-disclosure)
-describe los datos como `internal use only`. No se infiere permiso para
-publicar modelos, métricas o artefactos de portfolio. Solo podría reabrirse la
-evaluación con autorización escrita compatible.
+Datos crudos futuros permanecerían ignorados salvo permiso expreso. Código,
+métricas y modelos se revisarían separadamente porque las reglas pueden
+tratarlos de modo distinto.
 
-## Información que debe verificarse después de una adquisición autorizada
+## Próximo paso permitido
 
-Para Freddie Mac Sample, una futura fase B deberá verificar:
+Solicitar aclaración documental humana sobre Credit Risk Model Stability,
+conservando evidencia fechada de reglas sin aceptarlas ni descargar datos. Si
+términos, outputs o target siguen ambiguos, el candidato pasa a `Reject`.
 
-- versión de términos, release, cutoffs, ficheros y hashes;
-- esquema real frente al User Guide;
-- cardinalidad y unicidad de `Loan Sequence Number`;
-- enlaces de refinanciación, duplicados, gaps y secuencias mensuales;
-- missing, códigos especiales y correcciones retrospectivas;
-- ausencia de nombres, direcciones, texto libre u otra PII residual;
-- riesgo de reidentificación y proxies geográficos/crediticios;
-- instante de decisión as-of y disponibilidad de cada feature;
-- separación de originación, servicing y outcome;
-- target, horizonte, prepago, censura, modificaciones y reporting lags;
-- viabilidad de train/validation/calibration/test temporal y agrupado;
-- reproducibilidad sin redistribuir el artefacto.
-
-## Rechazo inmediato durante la inspección
-
-El candidato se rechazará si:
-
-- los términos no cubren el uso real o los outputs públicos previstos;
-- aparece PII o la procedencia deja de ser verificable;
-- no puede congelarse y reproducirse el release;
-- no existe un instante de decisión reconstruible;
-- el loan ID y enlaces conocidos no permiten controlar entity leakage;
-- el target/horizonte o la madurez no pueden reconstruirse;
-- campos post-decision/post-outcome son inseparables;
-- atributos sensibles no pueden excluirse de inputs;
-- no puede reservarse un test temporal intacto.
-
-## Recomendación humana pendiente
-
-Se solicita una decisión humana sobre si autorizar **solo el gate documental
-previo** para Freddie Mac SFLLD Sample:
-
-- confirmar uso público no comercial y límites de publicación;
-- aceptar o rechazar los términos específicos vigentes;
-- designar responsable y política de cuarentena;
-- autorizar, en una tarea posterior separada, una release/sample exactos.
-
-Sin esa aprobación, el estado permanece `Needs controlled inspection`. Este
-documento no constituye asesoramiento jurídico ni un ADR de selección.
+No procede ingesta, datos sintéticos, features, splits o entrenamiento. No se
+crea ADR porque no se acepta una fuente.
