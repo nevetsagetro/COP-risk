@@ -1,0 +1,103 @@
+dataset_id: sflld-sample-2019
+contract_version: "docs/data-contract.md@ac3eb78"
+inspection_date: "2026-07-26"
+status: reject
+training_approved: false
+source:
+  publisher: Freddie Mac
+  product: Single-Family Loan-Level Dataset Sample
+  vintage: 2019
+  release: not_evidenced_from_local_artifact
+  terms_acceptance: pending_human_decision
+local_artifact:
+  path: data/raw/sample_2019.zip
+  ignored_by_git: true
+  size_bytes: 29035641
+  sha256: 66bd8abbf119b773b717957a5dcfd1279fc035c2912abe144bb4c54442fdcfc1
+  file_type: zip_deflate
+  integrity:
+    unzip_test: pass
+    member_count: 2
+    encrypted_members: 0
+    symlinks: 0
+    unsafe_paths: 0
+quarantine:
+  path: data/raw/sflld/2019/quarantine
+  ignored_by_git: true
+  files:
+    - name: sample_orig_2019.txt
+      role: origination
+      size_bytes: 7758569
+      sha256: 62a0f8d66a238d7422859ed2d5fd852061a9b2c44b539173c89236c898a8b894
+      encoding: ascii_utf8_compatible
+      delimiter: "|"
+      header: false
+      rows: 50000
+      columns: 32
+      malformed_width_rows: 0
+      exact_duplicate_rows: 0
+      natural_key: [loan_sequence_number]
+      duplicate_natural_keys: 0
+      observed_first_payment_month:
+        min: "201902"
+        max: "202106"
+      blank_counts_by_position:
+        [0, 0, 0, 0, 4574, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 48333, 49970, 0, 49970, 0, 0, 0]
+    - name: sample_svcg_2019.txt
+      role: monthly_performance
+      size_bytes: 159607046
+      sha256: e5f7bc10014ee12e121433aacbb03c0f888e3815247fc30fe791a0c38f7a9023
+      encoding: ascii_utf8_compatible
+      delimiter: "|"
+      header: false
+      rows: 1847477
+      columns: 32
+      malformed_width_rows: 0
+      exact_duplicate_rows: 0
+      natural_key: [loan_sequence_number, monthly_reporting_period]
+      duplicate_natural_keys: 0
+      observed_reporting_month:
+        min: "201901"
+        max: "202509"
+      blank_counts_by_position:
+        [0, 0, 0, 0, 0, 0, 1847350, 1836145, 1812215, 1812215, 0, 0,
+         1812251, 1847443, 1847443, 1847443, 1847443, 1847443, 1847443,
+         1847443, 1847443, 1847443, 1845450, 1836145, 1786990, 0,
+         1812215, 1847443, 1818617, 1816995, 1776144, 0]
+  reconciliation:
+    origination_loans: 50000
+    servicing_loans: 50000
+    origination_without_servicing: 0
+    servicing_without_origination: 0
+    orphan_servicing_rows: 0
+provisional_roles:
+  loan_sequence_number: partition_only
+  origination_fields: unapproved_candidates
+  servicing_fields_for_origination_model: target_only_audit_only_or_prohibited
+  protected_or_proxy_fields: require_human_review
+open_contract_fields:
+  - entity_id_at_borrower_level
+  - observation_id_definition
+  - decision_timestamp
+  - available_at_by_input
+  - target_and_horizon
+  - outcome_timestamp
+  - label_observed_at
+  - followup_end
+  - snapshot_as_of
+  - maturity_and_censoring
+  - final_feature_roles
+  - temporal_and_entity_split
+  - privacy_and_reidentification_review
+  - accepted_terms_and_release_lineage
+monitoring_future:
+  usable_source_keys:
+    - loan_sequence_number
+    - monthly_reporting_period
+  required_future_metadata:
+    - prediction_id
+    - prediction_timestamp
+    - model_version
+    - batch
+  metrics_windows_thresholds: pending_decision

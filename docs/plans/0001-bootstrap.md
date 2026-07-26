@@ -744,7 +744,12 @@ drift no promueve por sí mismo.
   0004, sin seleccionar datos ni implementar código ML.
 - [x] 2026-07-26: Milestone 3 completado documentalmente mediante el ExecPlan
   0005; cuatro candidatos evaluados, ninguno adquirido o aceptado.
-- [ ] Milestone 4.
+- [x] Milestone 4A: registro e inspección controlada de SFLLD Sample 2019
+  completados mediante ExecPlan 0006; resultado `Reject` con la evidencia
+  actual,
+  sin aceptación para entrenamiento, split ni datos versionados.
+- [ ] Milestone 4: split y baseline, bloqueado hasta aceptación humana del
+  dataset y cierre de los requisitos pendientes del gate.
 - [ ] Milestone 5.
 - [ ] Milestone 6.
 - [ ] Milestone 7.
@@ -777,6 +782,9 @@ drift no promueve por sí mismo.
 - 2026-07-26: se añade un gate bloqueante entre investigación y split:
   términos, cuarentena, fase B, manifest y selección humana deben completarse
   en una tarea futura separada.
+- 2026-07-26: Milestone 4A registra e inspecciona el ZIP local en cuarentena;
+  el resultado `Reject` no acepta el snapshot y mantiene
+  bloqueados split y baseline.
 
 ## Hallazgos inesperados
 
