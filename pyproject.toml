@@ -8,13 +8,21 @@ version = "0.1.0"
 description = "Portfolio scaffold for a credit-risk demonstration"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
-dependencies = []
+dependencies = [
+    "numpy==2.2.3",
+    "pandas==2.2.3",
+    "pyarrow==19.0.1",
+    "PyYAML==6.0.2",
+    "xlrd==2.0.1",
+]
 
 [project.optional-dependencies]
 dev = [
     "mypy==1.15.0",
+    "pandas-stubs==2.2.3.241126",
     "pytest==8.3.5",
     "ruff==0.9.10",
+    "types-PyYAML==6.0.12.20241230",
 ]
 
 [tool.setuptools.packages.find]
@@ -37,3 +45,7 @@ select = ["E", "F", "I", "UP"]
 python_version = "3.12"
 strict = true
 files = ["src", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["pyarrow", "pyarrow.*"]
+ignore_missing_imports = true

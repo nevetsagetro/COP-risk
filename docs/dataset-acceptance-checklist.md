@@ -167,6 +167,12 @@ explícitamente el candidato si ocurre cualquiera de estos casos:
 
 Resultado: `Pending | Rejected | Eligible for human review`.
 
+Este resultado agregado describe aptitud para la vertical completa. Conforme a
+ADR 0008, un perfil adicional puede aceptar capacidades parciales con estados
+independientes. Esa aceptación debe nombrar el uso autorizado, conservar todos
+los fallos y no reinterpretar `Fail` temporal, longitudinal o productivo como
+`Pass`.
+
 Responsable:
 
 Fecha:

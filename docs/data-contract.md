@@ -211,6 +211,15 @@ inspección controlada y la checklist estén completas sin fallos; y el protocol
 de evaluación pueda reservar particiones válidas. La aceptación del contrato
 general no autoriza una descarga ni acepta ningún dataset.
 
+### Aceptación parcial por capacidad
+
+ADR 0008 permite evaluar usos independientes mediante un contrato
+machine-readable. Los rechazos duros anteriores siguen bloqueando la vertical
+completa y toda capacidad que dependa de ellos, pero un fallo temporal o
+longitudinal no invalida por sí solo un baseline académico estático si sus
+gates de provenance, licencia, esquema y target pasan. Cada fallo permanece
+visible; no existe puntuación compensatoria ni promoción entre capacidades.
+
 ## Decisiones humanas abiertas
 
 - fuente, licencia y responsable de aprobación;

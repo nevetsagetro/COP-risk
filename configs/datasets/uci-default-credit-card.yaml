@@ -1,0 +1,103 @@
+contract_version: 1
+dataset_id: uci-default-credit-card
+dataset_title: Default of Credit Card Clients
+publisher: UCI Machine Learning Repository
+official_page_url: https://archive.ics.uci.edu/dataset/350/default
+official_download_url: https://archive.ics.uci.edu/static/public/350/default+of+credit+card+clients.zip
+doi: 10.24432/C55S3H
+license:
+  identifier: CC-BY-4.0
+  url: https://creativecommons.org/licenses/by/4.0/
+acquisition_date: "2026-08-02"
+archive_filename: uci-default-credit-card.zip
+source_filename: default of credit card clients.xls
+source_member: default of credit card clients.xls
+output_root: data/raw/uci-default-credit-card
+snapshot_root: data/processed/uci-default-credit-card
+expected_schema:
+  rows: 30000
+  columns:
+    - ID
+    - LIMIT_BAL
+    - SEX
+    - EDUCATION
+    - MARRIAGE
+    - AGE
+    - PAY_0
+    - PAY_2
+    - PAY_3
+    - PAY_4
+    - PAY_5
+    - PAY_6
+    - BILL_AMT1
+    - BILL_AMT2
+    - BILL_AMT3
+    - BILL_AMT4
+    - BILL_AMT5
+    - BILL_AMT6
+    - PAY_AMT1
+    - PAY_AMT2
+    - PAY_AMT3
+    - PAY_AMT4
+    - PAY_AMT5
+    - PAY_AMT6
+    - default_payment_next_month
+target:
+  source_column: default payment next month
+  normalized_column: default_payment_next_month
+  allowed_values: [0, 1]
+  definition: binary default payment next month as published by UCI
+entity:
+  source_column: ID
+  semantics: unique row identifier; stable borrower identity not evidenced
+timestamps:
+  available: false
+  reason: monthly history columns exist but no row-level decision timestamp
+protected_or_sensitive_columns:
+  - SEX
+  - EDUCATION
+  - MARRIAGE
+  - AGE
+academic_split:
+  seed: 42
+  train_fraction: 0.70
+  validation_fraction: 0.15
+  test_fraction: 0.15
+  stratify_by: default_payment_next_month
+capabilities:
+  provenance:
+    status: pass
+    reason: official UCI page, DOI, and official download URL are declared
+  license:
+    status: pass
+    reason: official UCI page declares CC BY 4.0
+  target_definition:
+    status: pass
+    reason: UCI declares a binary default-payment-next-month response
+  schema:
+    status: pass
+    reason: expected 30000-row schema and target are machine-verifiable
+  entity_identity:
+    status: limited
+    reason: ID is unique but stable cross-event borrower semantics are not evidenced
+  timestamps:
+    status: fail
+    reason: no row-level decision, outcome, or label-availability timestamp
+  temporal_split:
+    status: fail
+    reason: no defensible row-level temporal ordering or future holdout
+  group_split:
+    status: limited
+    reason: unique IDs prevent row overlap but repeated-entity linkage is unavailable
+  academic_modeling:
+    status: pass
+    reason: fixed tabular binary-classification benchmark with reproducible stratified splits
+  longitudinal_monitoring:
+    status: fail
+    reason: no longitudinal entities, timestamps, or repeatable current cohorts
+  public_portfolio_use:
+    status: pass
+    reason: CC BY 4.0 permits use with attribution; raw data remains outside Git
+  production_claims:
+    status: fail
+    reason: academic dataset lacks operational lineage, temporal validation, and production evidence

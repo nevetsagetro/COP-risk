@@ -12,7 +12,8 @@ retraining con promoción separada.
 
 ## Estado actual verificable
 
-El repositorio contiene únicamente un baseline de ingeniería:
+El repositorio contiene un baseline de ingeniería y una primera capacidad de
+datos sintéticos:
 
 - documentación del proyecto y reglas para mantener ExecPlans;
 - un paquete Python mínimo bajo `src/cop`;
@@ -22,11 +23,22 @@ El repositorio contiene únicamente un baseline de ingeniería:
 - exclusiones de Git para secretos y artefactos locales;
 - perfiles de agentes de desarrollo;
 - un smoke test que comprueba que `cop` puede importarse;
-- una decisión aceptada y especificación documental, todavía sin
-  implementación, para el bootstrap sintético.
+- una decisión aceptada y configuración metodológica congelada para el
+  snapshot sintético v1 de demostración local;
+- un generador sintético por CLI con configuración YAML, Parquet, manifest,
+  hashes físicos/lógicos y validación contractual;
+- cinco splits temporales reproducibles y disjuntos por `borrower_id`, con
+  purga y manifest verificable.
+- un evaluador machine-readable de datasets por capacidad y un snapshot de UCI
+  Default of Credit Card Clients aceptado solo para baseline académico local,
+  con splits estratificados reproducibles.
 
-No hay dataset aceptado, versionado o utilizable para entrenamiento, ni EDA,
-pipeline de features, modelo, entrenamiento, experimento, API, imagen Docker
+Existen un snapshot sintético v1 aprobado exclusivamente para entrenamiento
+local de demostración; sus filas permanecen fuera de Git y su identidad se
+registra en `docs/datasets/synthetic-v1-acceptance.md`; y un snapshot UCI
+aceptado únicamente para baseline académico, documentado en
+`docs/datasets/uci-default-credit-card.md`. No hay EDA, pipeline de
+features, modelo, entrenamiento, experimento, API, imagen Docker
 funcional, servicio, orquestador, informe de drift, dashboard, retraining, base
 de datos o infraestructura cloud implementados. El ZIP local de SFLLD fue
 rechazado y no contradice este estado. Los directorios vacíos con nombres de
@@ -66,8 +78,8 @@ El baseline de desarrollo soporta Python 3.12 y usa `python3` como comando
 canónico. Las tecnologías enumeradas arriba están aceptadas para trabajo
 futuro, pero no se han añadido como dependencias ni se han implementado.
 
-Los ADR aceptados añaden estas decisiones documentales, todavía sin
-implementación:
+Los ADR aceptados añaden estas decisiones; su implementación debe comprobarse
+por separado en el árbol:
 
 - Prefect será el orquestador cuando exista un pipeline Python manual,
   reproducible, probado e idempotente;
@@ -82,13 +94,17 @@ implementación:
   configuración, semillas y snapshots serán versionados, con Parquet, manifest,
   hashes físicos/lógicos y `snapshot_as_of`.
 
+La primera versión del generador sintético y los splits v1 están implementados
+y validados por CLI. ADR 0007 acepta sus parámetros exclusivamente para la
+demostración sintética local. Esto no implementa el pipeline ML ni aporta
+evidencia sobre crédito real.
+
 ## Decisiones todavía pendientes
 
-Continúan sin decidir:
+Continúan sin decidir fuera del perfil sintético local de ADR 0007:
 
-- la definición final del target, umbral DPD y horizonte;
-- población, estimand, tamaño, borrowers, solicitudes y prevalencia;
-- ventanas, distribuciones, correlaciones y escenarios exactos de drift;
+- parámetros metodológicos para cualquier dataset real futuro;
+- distribuciones, correlaciones y escenarios exactos de drift posteriores;
 - el proveedor cloud, que permanece fuera de alcance;
 - el feature store y el almacenamiento de features;
 - las features concretas;
@@ -140,6 +156,47 @@ cp .env.example .env
 `.env` es local y está ignorado por Git. Los valores actuales de
 `.env.example` son ficticios y ninguna funcionalidad del paquete los consume
 todavía.
+
+## Generador sintético mínimo
+
+Tras instalar las dependencias, la configuración v1 se ejecuta con:
+
+```bash
+python3 scripts/generate_synthetic_snapshot.py \
+  --config configs/data/synthetic-v1-approved.yaml
+```
+
+La salida queda bajo `data/raw/synthetic/`, ignorada por Git. La CLI rechaza
+sobrescrituras; `--force` debe indicarse expresamente. Un snapshot existente se
+verifica sin escribir con:
+
+```bash
+python3 scripts/generate_synthetic_snapshot.py \
+  --verify data/raw/synthetic/<snapshot_id>
+```
+
+Los splits aprobados se crean después de verificar el snapshot:
+
+```bash
+python3 scripts/create_synthetic_splits.py \
+  --snapshot data/raw/synthetic/<snapshot_id>
+```
+
+Esta capacidad genera datos y splits de demostración; no crea un pipeline ML
+ni evidencia sobre crédito real.
+
+## Evaluación académica UCI
+
+La adquisición y evaluación reproducibles se ejecutan con:
+
+```bash
+python3 scripts/download_uci_credit_card.py
+python3 scripts/evaluate_dataset_candidate.py \
+  --acquisition data/raw/uci-default-credit-card/<acquisition_id>
+```
+
+La aceptación UCI es estática y académica. Sus fallos de temporalidad,
+monitoring longitudinal y producción permanecen explícitos.
 
 ## Planificación
 
