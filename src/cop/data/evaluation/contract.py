@@ -9,7 +9,7 @@ from typing import Any, Literal, cast
 
 import yaml
 
-from cop.data.synthetic.config import UniqueKeyLoader
+from cop.data.yaml import StrictYamlError, UniqueKeyLoader
 
 CapabilityStatus = Literal["pass", "limited", "needs_review", "fail", "not_applicable"]
 ALLOWED_STATUSES = {
@@ -144,7 +144,7 @@ def _validate(raw: dict[str, Any]) -> None:
 def load_dataset_contract(path: Path) -> DatasetContract:
     try:
         raw = yaml.load(path.read_text(encoding="utf-8"), Loader=UniqueKeyLoader)
-    except (OSError, yaml.YAMLError) as exc:
+    except (OSError, yaml.YAMLError, StrictYamlError) as exc:
         raise EvaluationError(f"cannot load dataset contract: {exc}") from exc
     if not isinstance(raw, dict):
         raise EvaluationError("dataset contract root must be a mapping")

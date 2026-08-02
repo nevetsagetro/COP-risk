@@ -14,11 +14,11 @@ import pyarrow.parquet as pq
 
 from cop.data.evaluation.contract import DatasetContract, EvaluationError
 from cop.data.evaluation.evaluator import load_evaluation
+from cop.data.hashing import logical_table_hash, sha256_file
 from cop.data.ingestion.uci_credit_card import (
     TARGET_NORMALIZED,
     verify_academic_snapshot,
 )
-from cop.data.synthetic.hashing import logical_table_hash, sha256_file
 
 ACADEMIC_SPLIT_VERSION = 1
 SPLIT_NAMES = ("train", "validation", "test")

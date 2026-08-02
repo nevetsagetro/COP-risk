@@ -12,34 +12,11 @@ from typing import Any
 
 import yaml
 
+from cop.data.yaml import StrictYamlError, UniqueKeyLoader
+
 
 class ConfigError(ValueError):
     """Raised when generator configuration is invalid."""
-
-
-class UniqueKeyLoader(yaml.SafeLoader):
-    """Safe YAML loader that rejects duplicate mapping keys."""
-
-
-def _construct_mapping(
-    loader: UniqueKeyLoader, node: yaml.MappingNode, deep: bool = False
-) -> dict[str, Any]:
-    mapping: dict[str, Any] = {}
-    for key_node, value_node in node.value:
-        key = loader.construct_object(key_node, deep=deep)  # type: ignore[no-untyped-call]
-        if not isinstance(key, str):
-            raise ConfigError("configuration keys must be strings")
-        if key in mapping:
-            raise ConfigError(f"duplicate configuration key: {key}")
-        mapping[key] = loader.construct_object(  # type: ignore[no-untyped-call]
-            value_node, deep=deep
-        )
-    return mapping
-
-
-UniqueKeyLoader.add_constructor(
-    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _construct_mapping
-)
 
 
 def _utc_timestamp(value: str, field: str) -> datetime:
@@ -229,7 +206,7 @@ def load_config(path: Path) -> SyntheticConfig:
     """Load a strict YAML configuration."""
     try:
         raw = yaml.load(path.read_text(encoding="utf-8"), Loader=UniqueKeyLoader)
-    except (OSError, yaml.YAMLError) as exc:
+    except (OSError, yaml.YAMLError, StrictYamlError) as exc:
         raise ConfigError(f"cannot load configuration: {exc}") from exc
     if not isinstance(raw, dict):
         raise ConfigError("configuration root must be a mapping")

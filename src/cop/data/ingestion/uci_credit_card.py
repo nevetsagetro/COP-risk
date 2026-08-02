@@ -15,7 +15,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from cop.data.evaluation.contract import DatasetContract, EvaluationError
-from cop.data.synthetic.hashing import logical_table_hash, sha256_file
+from cop.data.hashing import logical_table_hash, sha256_file
 
 ACQUISITION_MANIFEST_VERSION = 1
 SNAPSHOT_MANIFEST_VERSION = 2

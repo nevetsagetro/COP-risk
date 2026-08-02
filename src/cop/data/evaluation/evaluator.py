@@ -14,8 +14,8 @@ from cop.data.evaluation.contract import (
     CapabilityDecision,
     DatasetContract,
 )
+from cop.data.hashing import sha256_file
 from cop.data.ingestion.uci_credit_card import inspect_schema, verify_acquisition
-from cop.data.synthetic.hashing import sha256_file
 
 EVALUATION_MANIFEST_VERSION = 1
 
