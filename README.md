@@ -12,8 +12,8 @@ retraining con promoción separada.
 
 ## Estado actual verificable
 
-El repositorio contiene un baseline de ingeniería y una primera capacidad de
-datos sintéticos:
+El repositorio contiene un baseline de ingeniería y dos verticales de datos
+claramente separadas:
 
 - documentación del proyecto y reglas para mantener ExecPlans;
 - un paquete Python mínimo bajo `src/cop`;
@@ -32,6 +32,10 @@ datos sintéticos:
 - un evaluador machine-readable de datasets por capacidad y un snapshot de UCI
   Default of Credit Card Clients aceptado solo para baseline académico local,
   con splits estratificados reproducibles.
+
+UCI Default of Credit Card Clients es la vertical principal. El código UCI no
+depende del paquete sintético. La generación sintética se conserva como una
+vertical metodológica aislada y no define la ruta principal del proyecto.
 
 Existen un snapshot sintético v1 aprobado exclusivamente para entrenamiento
 local de demostración; sus filas permanecen fuera de Git y su identidad se
@@ -90,9 +94,10 @@ por separado en el árbol:
 - `uv.lock` será la estrategia de lock y se generará en un milestone posterior;
 - drift puede solicitar o iniciar challengers, pero promoción y rollback serán
   humanos, comparativos y auditados;
-- datos sintéticos deterministas serán la fuente principal inicial; generador,
-  configuración, semillas y snapshots serán versionados, con Parquet, manifest,
-  hashes físicos/lógicos y `snapshot_as_of`.
+- ADR 0006 estableció inicialmente los datos sintéticos como fuente principal;
+  ADR 0009 sustituye esa prioridad y establece UCI como vertical principal. La
+  implementación sintética existente se conserva aislada y no es dependencia
+  del pipeline UCI.
 
 La primera versión del generador sintético y los splits v1 están implementados
 y validados por CLI. ADR 0007 acepta sus parámetros exclusivamente para la

@@ -1,5 +1,11 @@
 # Rationale de selección documental
 
+> **Estado histórico:** este documento registra la conclusión de la búsqueda
+> anterior. ADR 0008 aceptó posteriormente UCI Default of Credit Card Clients
+> para baseline académico y ADR 0009 lo estableció como vertical principal.
+> Las recomendaciones de bootstrap sintético y la frase “ningún candidato real
+> está autorizado” que siguen se conservan como historial y están superseded.
+
 ## Decisión final de búsqueda real
 
 Milestone 4C cierra la tercera y última búsqueda dirigida. Se evaluaron

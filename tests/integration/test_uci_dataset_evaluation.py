@@ -23,13 +23,13 @@ from cop.data.evaluation.evaluator import (
     load_evaluation,
     verify_evaluation,
 )
+from cop.data.hashing import sha256_file
 from cop.data.ingestion.uci_credit_card import (
     acquire_official_dataset,
     materialize_academic_snapshot,
     verify_academic_snapshot,
     verify_acquisition,
 )
-from cop.data.synthetic.hashing import sha256_file
 
 CONFIG = Path("configs/datasets/uci-default-credit-card.yaml")
 
