@@ -54,7 +54,28 @@ def get_home_credit_service() -> HomeCreditService:
                 "Home Credit static baseline artifacts are not available"
             )
         run = candidates[-1].parent
-    return HomeCreditService(snapshot, run)
+    comparison_snapshot = Path(
+        os.environ.get(
+            "COP_HOME_CREDIT_V2_SNAPSHOT", "data/processed/home-credit-static-v2"
+        )
+    )
+    configured_comparison_run = os.environ.get("COP_HOME_CREDIT_V2_RUN")
+    comparison_run: Path | None
+    if configured_comparison_run:
+        comparison_run = Path(configured_comparison_run)
+    else:
+        comparison_runs = sorted(
+            Path("runs/home-credit-static-v2").glob("*/results.json")
+        )
+        comparison_run = comparison_runs[-1].parent if comparison_runs else None
+    return HomeCreditService(
+        snapshot,
+        run,
+        comparison_snapshot_directory=(
+            comparison_snapshot if comparison_run is not None else None
+        ),
+        comparison_run_directory=comparison_run,
+    )
 
 
 app = FastAPI(

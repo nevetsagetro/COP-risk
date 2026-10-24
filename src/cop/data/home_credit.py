@@ -9,6 +9,9 @@ import pandas as pd
 
 HOME_CREDIT_TARGET = "TARGET"
 HOME_CREDIT_ID = "SK_ID_CURR"
+HOME_CREDIT_SPLIT_SEED = 42
+HOME_CREDIT_FEATURE_VERSION_V0 = "features-v0"
+HOME_CREDIT_FEATURE_VERSION_V2 = "features-v2"
 
 HOME_CREDIT_AUDIT_ONLY_COLUMNS = (
     "CODE_GENDER",
@@ -68,6 +71,27 @@ HOME_CREDIT_DERIVED_FEATURES = (
     "INSTALLMENT_LATE_COUNT",
     "INSTALLMENT_SHORTFALL_SUM",
     "INSTALLMENT_PAYMENT_SUM",
+    "INSTALLMENT_AMOUNT_DUE_SUM",
+)
+
+HOME_CREDIT_ENGINEERED_FEATURES_V2 = (
+    "APP_CREDIT_INCOME_RATIO",
+    "APP_ANNUITY_INCOME_RATIO",
+    "APP_GOODS_CREDIT_RATIO",
+    "APP_INCOME_PER_FAMILY",
+    "EXT_SOURCE_MEAN",
+    "EXT_SOURCE_MIN",
+    "EXT_SOURCE_MAX",
+    "EXT_SOURCE_STD",
+    "EXT_SOURCE_MISSING_COUNT",
+    "BUREAU_DEBT_CREDIT_RATIO",
+    "BUREAU_ACTIVE_RATIO",
+    "BUREAU_OVERDUE_FLAG",
+    "PREVIOUS_APPROVAL_RATE",
+    "PREVIOUS_REFUSAL_RATE",
+    "PREVIOUS_CREDIT_MEAN",
+    "INSTALLMENT_LATE_RATE",
+    "INSTALLMENT_PAYMENT_COVERAGE",
 )
 
 
@@ -170,6 +194,7 @@ def aggregate_installments(frame: pd.DataFrame) -> pd.DataFrame:
     historical["_late"] = (
         payment_days.loc[historical.index] > installment_days.loc[historical.index]
     ).astype(int)
+    historical["_amount_due"] = amount_due
     historical["_shortfall"] = (amount_due - amount_paid).clip(lower=0)
     historical["_payment"] = amount_paid
     return historical.groupby(HOME_CREDIT_ID, as_index=False).agg(
@@ -177,6 +202,72 @@ def aggregate_installments(frame: pd.DataFrame) -> pd.DataFrame:
         INSTALLMENT_LATE_COUNT=("_late", "sum"),
         INSTALLMENT_SHORTFALL_SUM=("_shortfall", "sum"),
         INSTALLMENT_PAYMENT_SUM=("_payment", "sum"),
+        INSTALLMENT_AMOUNT_DUE_SUM=("_amount_due", "sum"),
+    )
+
+
+def add_engineered_features_v2(frame: pd.DataFrame) -> pd.DataFrame:
+    """Add documented ratios and missingness signals to the frozen v0 frame."""
+    result = frame.copy()
+
+    def ratio(numerator: str, denominator: str) -> pd.Series[Any]:
+        denominator_values = _numeric(result, denominator)
+        denominator_values = denominator_values.mask(denominator_values == 0)
+        return _numeric(result, numerator) / denominator_values
+
+    result["APP_CREDIT_INCOME_RATIO"] = ratio("AMT_CREDIT", "AMT_INCOME_TOTAL")
+    result["APP_ANNUITY_INCOME_RATIO"] = ratio("AMT_ANNUITY", "AMT_INCOME_TOTAL")
+    result["APP_GOODS_CREDIT_RATIO"] = ratio("AMT_GOODS_PRICE", "AMT_CREDIT")
+    family = _numeric(result, "CNT_FAM_MEMBERS").clip(lower=1)
+    result["APP_INCOME_PER_FAMILY"] = _numeric(result, "AMT_INCOME_TOTAL") / family
+
+    external = result[["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3"]].apply(
+        pd.to_numeric, errors="coerce"
+    )
+    result["EXT_SOURCE_MEAN"] = external.mean(axis=1)
+    result["EXT_SOURCE_MIN"] = external.min(axis=1)
+    result["EXT_SOURCE_MAX"] = external.max(axis=1)
+    result["EXT_SOURCE_STD"] = external.std(axis=1, ddof=0)
+    result["EXT_SOURCE_MISSING_COUNT"] = external.isna().sum(axis=1).astype(float)
+
+    result["BUREAU_DEBT_CREDIT_RATIO"] = ratio("BUREAU_DEBT_SUM", "BUREAU_CREDIT_SUM")
+    result["BUREAU_ACTIVE_RATIO"] = ratio("BUREAU_ACTIVE_COUNT", "BUREAU_COUNT")
+    result["BUREAU_OVERDUE_FLAG"] = (
+        _numeric(result, "BUREAU_OVERDUE_MAX").fillna(0) > 0
+    ).astype(float)
+    result["PREVIOUS_APPROVAL_RATE"] = ratio(
+        "PREVIOUS_APPROVED_COUNT", "PREVIOUS_APPLICATION_COUNT"
+    )
+    result["PREVIOUS_REFUSAL_RATE"] = ratio(
+        "PREVIOUS_REFUSED_COUNT", "PREVIOUS_APPLICATION_COUNT"
+    )
+    result["PREVIOUS_CREDIT_MEAN"] = ratio(
+        "PREVIOUS_CREDIT_SUM", "PREVIOUS_APPLICATION_COUNT"
+    )
+    result["INSTALLMENT_LATE_RATE"] = ratio(
+        "INSTALLMENT_LATE_COUNT", "INSTALLMENT_COUNT"
+    )
+    result["INSTALLMENT_PAYMENT_COVERAGE"] = ratio(
+        "INSTALLMENT_PAYMENT_SUM", "INSTALLMENT_AMOUNT_DUE_SUM"
+    )
+    return result
+
+
+def build_static_feature_frame_v2(
+    application: pd.DataFrame,
+    *,
+    bureau: pd.DataFrame | None = None,
+    previous_applications: pd.DataFrame | None = None,
+    installments: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    """Build the v0 contract and append only the versioned v2 features."""
+    return add_engineered_features_v2(
+        build_static_feature_frame(
+            application,
+            bureau=bureau,
+            previous_applications=previous_applications,
+            installments=installments,
+        )
     )
 
 
@@ -209,7 +300,7 @@ def build_static_feature_frame(
 def stable_entity_split(
     frame: pd.DataFrame,
     *,
-    seed: int = 42,
+    seed: int = HOME_CREDIT_SPLIT_SEED,
     train_fraction: float = 0.70,
     validation_fraction: float = 0.15,
 ) -> pd.DataFrame:

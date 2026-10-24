@@ -23,28 +23,28 @@ waves:
         depends_on: []
         allowed_paths: [docs/plans/, docs/datasets/, runs/]
         prohibited_paths: [data/, app/web/, src/cop/training/]
-        status: ready
+        status: complete_pending_review
       - id: HC33-002
         title: Implement seed and experiment metadata contract
         agent: mlops
         depends_on: [HC33-001]
         allowed_paths: [src/cop/training/, src/cop/evaluation/, src/cop/serving/, scripts/, tests/]
         prohibited_paths: [data/, runs/, app/web/]
-        status: proposed
+        status: complete_pending_review
       - id: HC33-003
         title: Perform read-only leakage and metric reconciliation review
         agent: reviewer
         depends_on: [HC33-001, HC33-002]
         allowed_paths: [docs/plans/, docs/decisions/, src/, tests/]
         prohibited_paths: [data/, runs/, .git/]
-        status: proposed
+        status: blocked_on_HC33-002
       - id: HC33-004
         title: Write the human-readable baseline protocol
         agent: coordinator
         depends_on: [HC33-003]
         allowed_paths: [docs/plans/, docs/model-cards/, app/web/, tests/]
         prohibited_paths: [data/, runs/, src/cop/training/]
-        status: proposed
+        status: blocked_on_HC33-003
   - id: wave-02-feature-engineering-v2
     name: Feature Engineering v2
     purpose: Add leakage-safe feature families and measure their contribution through ablation.
@@ -59,7 +59,7 @@ waves:
         depends_on: [HC33-004]
         allowed_paths: [docs/datasets/, docs/plans/, src/cop/data/, tests/]
         prohibited_paths: [data/, runs/, app/web/]
-        status: proposed
+        status: blocked_on_HC33-004
       - id: HC33-006
         title: Implement versioned financial and behavior features
         agent: data_ml

@@ -25,13 +25,16 @@ from sklearn.preprocessing import (  # type: ignore[import-untyped]
 from cop.data.hashing import sha256_file
 from cop.data.home_credit import (
     HOME_CREDIT_AUDIT_ONLY_COLUMNS,
+    HOME_CREDIT_FEATURE_VERSION_V0,
     HOME_CREDIT_ID,
+    HOME_CREDIT_SPLIT_SEED,
     HOME_CREDIT_TARGET,
 )
 from cop.evaluation.binary import binary_classification_metrics
 
 HOME_CREDIT_MODEL_NAMES = ("logistic_regression", "lightgbm")
 HOME_CREDIT_TRAINING_VERSION = 1
+HOME_CREDIT_EXPERIMENT_SEED = 42
 
 
 @dataclass(frozen=True)
@@ -108,7 +111,7 @@ def build_home_credit_models(data: HomeCreditData) -> dict[str, Pipeline]:
                         class_weight=None,
                         max_iter=500,
                         solver="liblinear",
-                        random_state=42,
+                        random_state=HOME_CREDIT_EXPERIMENT_SEED,
                     ),
                 ),
             ]
@@ -124,7 +127,7 @@ def build_home_credit_models(data: HomeCreditData) -> dict[str, Pipeline]:
                         num_leaves=31,
                         class_weight=None,
                         n_jobs=1,
-                        random_state=42,
+                        random_state=HOME_CREDIT_EXPERIMENT_SEED,
                         verbosity=-1,
                     ),
                 ),
@@ -162,7 +165,11 @@ def run_home_credit_baseline(
         "training_version": HOME_CREDIT_TRAINING_VERSION,
         "snapshot_sha256": sha256_file(manifest_path),
         "models": HOME_CREDIT_MODEL_NAMES,
-        "seed": 42,
+        "feature_version": manifest.get(
+            "feature_version", HOME_CREDIT_FEATURE_VERSION_V0
+        ),
+        "split_seed": manifest.get("split_seed", HOME_CREDIT_SPLIT_SEED),
+        "experiment_seed": HOME_CREDIT_EXPERIMENT_SEED,
     }
     run_id = (
         "home-credit-static-"
@@ -201,6 +208,11 @@ def run_home_credit_baseline(
     )
     report = {
         "training_version": HOME_CREDIT_TRAINING_VERSION,
+        "feature_version": manifest.get(
+            "feature_version", HOME_CREDIT_FEATURE_VERSION_V0
+        ),
+        "split_seed": manifest.get("split_seed", HOME_CREDIT_SPLIT_SEED),
+        "experiment_seed": HOME_CREDIT_EXPERIMENT_SEED,
         "authorized_use": "academic_static_benchmark_only",
         "test_status": "unopened",
         "dataset_id": manifest["dataset_id"],

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Any, cast
 
 import numpy as np
@@ -12,6 +14,7 @@ from sklearn.pipeline import Pipeline  # type: ignore[import-untyped]
 
 from cop.evaluation.binary import binary_classification_metrics
 from cop.training.home_credit import (
+    HOME_CREDIT_EXPERIMENT_SEED,
     HomeCreditData,
     _positive_probability,
     _preprocessor,
@@ -42,7 +45,7 @@ def _build_candidate(
             class_weight=None,
             max_iter=500,
             solver="liblinear",
-            random_state=42,
+            random_state=HOME_CREDIT_EXPERIMENT_SEED,
         )
         scale_numeric = True
     elif name == "lightgbm":
@@ -50,7 +53,7 @@ def _build_candidate(
             **parameters,
             class_weight=None,
             n_jobs=1,
-            random_state=42,
+            random_state=HOME_CREDIT_EXPERIMENT_SEED,
             verbosity=-1,
         )
         scale_numeric = False
@@ -73,7 +76,9 @@ def _candidate_cv(
 ) -> dict[str, Any]:
     target = data.train["TARGET"].to_numpy(dtype=np.int64)
     features = data.train.loc[:, list(data.feature_columns)]
-    splitter = StratifiedKFold(n_splits=folds, shuffle=True, random_state=42)
+    splitter = StratifiedKFold(
+        n_splits=folds, shuffle=True, random_state=HOME_CREDIT_EXPERIMENT_SEED
+    )
     fold_metrics: list[dict[str, float]] = []
     for train_index, validation_index in splitter.split(features, target):
         model = _build_candidate(data, name, parameters)
@@ -114,7 +119,13 @@ def run_home_credit_model_lab(
     """Search candidates on train CV and evaluate selected candidates on validation."""
     if folds < 3:
         raise ValueError("Home Credit model lab requires at least three folds")
-    data = load_static_development_data(snapshot_directory)
+    snapshot_path = Path(snapshot_directory)
+    data = load_static_development_data(snapshot_path)
+    manifest_path = snapshot_path / "manifest.json"
+    feature_version = "features-v0"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        feature_version = str(manifest.get("feature_version", feature_version))
     train_features = data.train.loc[:, list(data.feature_columns)]
     train_target = data.train["TARGET"].to_numpy(dtype=np.int64)
     validation_features = data.validation.loc[:, list(data.feature_columns)]
@@ -158,6 +169,8 @@ def run_home_credit_model_lab(
         "selection_split": "train_cross_validation",
         "evaluation_split": "validation",
         "primary_selection_metric": "average_precision",
+        "experiment_seed": HOME_CREDIT_EXPERIMENT_SEED,
+        "feature_version": feature_version,
         "folds": folds,
         "models": models,
         "static_limitation": "No application timestamp; no temporal stability claim.",

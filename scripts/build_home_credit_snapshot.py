@@ -13,8 +13,12 @@ from cop.data.hashing import logical_table_hash, sha256_file
 from cop.data.home_credit import (
     HOME_CREDIT_APPLICATION_FEATURES,
     HOME_CREDIT_AUDIT_ONLY_COLUMNS,
+    HOME_CREDIT_FEATURE_VERSION_V0,
+    HOME_CREDIT_FEATURE_VERSION_V2,
     HOME_CREDIT_ID,
+    HOME_CREDIT_SPLIT_SEED,
     HOME_CREDIT_TARGET,
+    add_engineered_features_v2,
     aggregate_bureau,
     aggregate_installments,
     aggregate_previous_applications,
@@ -108,14 +112,19 @@ def _read_installments(path: Path) -> pd.DataFrame:
             "INSTALLMENT_LATE_COUNT",
             "INSTALLMENT_SHORTFALL_SUM",
             "INSTALLMENT_PAYMENT_SUM",
+            "INSTALLMENT_AMOUNT_DUE_SUM",
         ),
     )
 
 
-def _manifest(frame: pd.DataFrame, source_tables: list[str]) -> dict[str, Any]:
-    split = stable_entity_split(frame)
+def _manifest(
+    frame: pd.DataFrame, source_tables: list[str], feature_version: str
+) -> dict[str, Any]:
+    split = stable_entity_split(frame, seed=HOME_CREDIT_SPLIT_SEED)
     return {
         "snapshot_version": 1,
+        "feature_version": feature_version,
+        "split_seed": HOME_CREDIT_SPLIT_SEED,
         "dataset_id": "home-credit-default-risk",
         "authorized_use": "academic_static_benchmark_only",
         "temporal_status": "not_available_in_source_archive",
@@ -147,13 +156,23 @@ def _manifest(frame: pd.DataFrame, source_tables: list[str]) -> dict[str, Any]:
     }
 
 
-def build(acquisition: Path, output: Path) -> Path:
+def build(
+    acquisition: Path,
+    output: Path,
+    *,
+    feature_version: str = HOME_CREDIT_FEATURE_VERSION_V0,
+) -> Path:
     if output.exists():
         raise FileExistsError(f"output already exists; refusing to overwrite: {output}")
     application = _read_application(acquisition / "application_train.csv")
     bureau = _read_bureau(acquisition / "bureau.csv")
     previous = _read_previous(acquisition / "previous_application.csv")
     installments = _read_installments(acquisition / "installments_payments.csv")
+    if feature_version not in {
+        HOME_CREDIT_FEATURE_VERSION_V0,
+        HOME_CREDIT_FEATURE_VERSION_V2,
+    }:
+        raise ValueError(f"unsupported feature version: {feature_version}")
     frame = build_static_feature_frame(application)
     for aggregate in (bureau, previous, installments):
         frame = frame.merge(
@@ -162,7 +181,9 @@ def build(acquisition: Path, output: Path) -> Path:
             how="left",
             validate="one_to_one",
         )
-    assignments = stable_entity_split(frame)
+    if feature_version == HOME_CREDIT_FEATURE_VERSION_V2:
+        frame = add_engineered_features_v2(frame)
+    assignments = stable_entity_split(frame, seed=HOME_CREDIT_SPLIT_SEED)
     frame = frame.merge(
         assignments, on=[HOME_CREDIT_ID, HOME_CREDIT_TARGET], validate="one_to_one"
     )
@@ -181,6 +202,7 @@ def build(acquisition: Path, output: Path) -> Path:
             "previous_application.csv",
             "installments_payments.csv",
         ],
+        feature_version,
     )
     manifest["files"] = {
         name: {
@@ -205,8 +227,15 @@ def main() -> int:
     parser.add_argument(
         "--output", type=Path, default=Path("data/processed/home-credit-static")
     )
+    parser.add_argument(
+        "--feature-version",
+        choices=(HOME_CREDIT_FEATURE_VERSION_V0, HOME_CREDIT_FEATURE_VERSION_V2),
+        default=HOME_CREDIT_FEATURE_VERSION_V0,
+    )
     args = parser.parse_args()
-    destination = build(args.acquisition, args.output)
+    destination = build(
+        args.acquisition, args.output, feature_version=args.feature_version
+    )
     print(f"created static snapshot: {destination}")
     return 0
 

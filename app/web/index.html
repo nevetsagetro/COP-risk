@@ -71,17 +71,17 @@
 
         <article class="home-chapter" id="home-chapter-data" data-story-chapter tabindex="-1">
           <div class="home-chapter-copy"><span class="chapter-number">02 · DATA BOUNDARY</span><h2>Which evidence is open to the model?</h2><p>We fit on train, select with train cross-validation, evaluate the selected candidates on validation, and keep the final test unopened. The split is entity-disjoint and static because the source archive has no defensible application timestamp.</p><div class="story-checkpoint"><b>What this protects</b><span>Selection decisions do not use the final test.</span></div></div>
-          <div class="home-chapter-stage"><div id="home-split-chart" class="chart chart-wide" role="img" aria-label="Home Credit train validation and test split chart"></div><div id="home-data-summary" class="story-data-summary"></div></div>
+          <div class="home-chapter-stage"><div id="home-split-chart" class="chart chart-wide" role="img" aria-label="Home Credit train validation and test split chart"></div><div id="home-data-summary" class="story-data-summary"></div><div id="home-reproducibility" class="reproducibility-card" aria-live="polite">Loading reproducibility contract…</div></div>
         </article>
 
         <article class="home-chapter" id="home-chapter-features" data-story-chapter tabindex="-1">
           <div class="home-chapter-copy"><span class="chapter-number">03 · FEATURE CONSTRUCTION</span><h2>How does raw data become model input?</h2><p>The pipeline keeps the application table as the anchor and adds grouped aggregates from public historical tables. The groups describe the engineering path; they do not establish causality.</p><div class="story-checkpoint"><b>Feature contract</b><span>Audit-only columns remain outside model inputs.</span></div></div>
-          <div class="home-chapter-stage"><div id="home-feature-groups" class="feature-story-grid"></div><p id="home-audit-only" class="technical-note"></p><p class="technical-note">The groups are feature provenance, not a feature-importance claim.</p></div>
+          <div class="home-chapter-stage"><div id="home-feature-groups" class="feature-story-grid"></div><div id="home-feature-comparison" class="reproducibility-card" aria-live="polite">Loading feature comparison…</div><p id="home-audit-only" class="technical-note"></p><p class="technical-note">The groups are feature provenance, not a feature-importance claim.</p></div>
         </article>
 
         <article class="home-chapter" id="home-chapter-models" data-story-chapter tabindex="-1">
           <div class="home-chapter-copy"><span class="chapter-number">04 · MODEL ITERATIONS</span><h2>How did the candidate improve?</h2><p>Each point is a controlled trial. The mean shows train cross-validation Average Precision; the whisker shows fold variation. The selected point is the best candidate under the declared primary metric.</p><div class="story-checkpoint"><b>Selection rule</b><span>Choose by train-CV Average Precision, then inspect validation once.</span></div></div>
-          <div class="home-chapter-stage"><div id="home-trial-chart" class="chart chart-wide" role="img" aria-label="Home Credit model trial comparison"></div><p id="home-iteration-result" class="lab-conclusion" aria-live="polite">Loading the iteration result…</p><div id="home-iteration-summary" class="model-cards"></div><div class="table-wrap"><table id="home-iteration-table"><thead><tr><th>Model</th><th>Iteration</th><th>Parameters</th><th>CV AP</th><th>Fold variation</th><th>Rank</th><th>Validation AP</th></tr></thead><tbody></tbody></table></div></div>
+          <div class="home-chapter-stage"><div class="academic-process" aria-label="Model development process"><article><b>1 · Define</b><span>Freeze data, features, seed and metric.</span></article><article><b>2 · Fit</b><span>Train candidates inside the training split.</span></article><article><b>3 · Compare</b><span>Use cross-validation to select a candidate.</span></article><article><b>4 · Check</b><span>Use validation once to test the conclusion.</span></article></div><div id="home-trial-chart" class="chart chart-wide" role="img" aria-label="Home Credit model trial comparison"></div><p id="home-iteration-result" class="lab-conclusion" aria-live="polite">Loading the iteration result…</p><div id="home-iteration-summary" class="model-cards"></div><div class="table-wrap"><table id="home-iteration-table"><thead><tr><th>Model</th><th>Iteration</th><th>Parameters</th><th>CV AP</th><th>Fold variation</th><th>Rank</th><th>Validation AP</th></tr></thead><tbody></tbody></table></div></div>
         </article>
 
         <article class="home-chapter" id="home-chapter-validation" data-story-chapter tabindex="-1">
@@ -204,7 +204,7 @@
       </div>
     </main>
     <footer>Home Credit Default Risk · static academic benchmark · UCI retained as reference · final tests closed</footer>
-    <script src="/assets/app.js?v=model-lab-27"></script>
+    <script src="/assets/app.js?v=model-lab-28"></script>
     <script src="/assets/language.js?v=toggle-5"></script>
   </body>
 </html>

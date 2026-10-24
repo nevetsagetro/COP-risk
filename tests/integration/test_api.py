@@ -60,6 +60,8 @@ def test_health_and_static_frontend() -> None:
     assert 'id="home-trial-chart"' in frontend.text
     assert 'id="home-iteration-table"' in frontend.text
     assert 'id="home-data-summary"' in frontend.text
+    assert 'id="home-reproducibility"' in frontend.text
+    assert "academic-process" in frontend.text
     assert 'id="home-audit-only"' in frontend.text
     assert 'id="home-policy-chart"' in frontend.text
     assert 'id="home-validation-chart"' in frontend.text
@@ -78,7 +80,7 @@ def test_health_and_static_frontend() -> None:
     assert "Which trial performed best?" in frontend.text
     assert 'id="journey-panel"' in frontend.text
     assert "From dataset to final model decision" in frontend.text
-    assert "/assets/app.js?v=model-lab-27" in frontend.text
+    assert "/assets/app.js?v=model-lab-28" in frontend.text
     assert 'id="home-iteration-result"' in frontend.text
     assert "/assets/language.js?v=toggle-5" in frontend.text
     app_script = request("GET", "/assets/app.js?v=model-lab-5")
@@ -173,6 +175,21 @@ def test_read_only_analytical_endpoints_keep_test_closed() -> None:
     assert academic["test_status"] == "unopened"
     assert academic["evidence_boundary"]["fit_split"] == "train"
     assert academic["evidence_boundary"]["evaluation_split"] == "validation"
+    assert academic["reproducibility"]["split_seed"] == 42
+    assert academic["reproducibility"]["experiment_seed"] == 42
+    assert academic["reproducibility"]["cross_validation_folds"] == 3
+    assert academic["reproducibility"]["feature_version"] == "features-v0"
+    if academic["feature_comparison"]["status"] == "available":
+        assert academic["feature_comparison"]["baseline_feature_count"] == 44
+        assert academic["feature_comparison"]["challenger_feature_count"] == 62
+        assert all(
+            row["validation_average_precision_delta"]
+            == pytest.approx(
+                row["challenger_validation_average_precision"]
+                - row["baseline_validation_average_precision"]
+            )
+            for row in academic["feature_comparison"]["models"]
+        )
     assert academic["feature_groups"]
     assert academic["iterations"]
     assert all(

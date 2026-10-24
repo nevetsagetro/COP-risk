@@ -224,8 +224,9 @@ Wave-specific evidence must include:
 
 - [x] Roadmap translated into six waves and bounded tasks.
 - [x] Current baseline and missing reproducibility metadata audited.
-- [ ] Wave 1 baseline contract implementation (in progress).
-- [ ] Wave 2 Feature Engineering v2.
+- [x] Wave 1 baseline contract implementation.
+- [x] Wave 2 Feature Engineering v2 snapshot and API/frontend comparison.
+- [ ] Wave 2 feature-family ablation report.
 - [ ] Wave 3 Model Benchmark v2.
 - [ ] Wave 4 Deep Learning benchmark.
 - [ ] Wave 5 Explainability and robustness.
@@ -252,11 +253,17 @@ Wave-specific evidence must include:
 
 ## Resultados y retrospectiva
 
-No implementation has been performed under this proposed plan. The baseline
-and the Home Credit academic frontend remain available as the starting point.
-The main risk is adding complexity without a stable improvement; every wave
-therefore requires an ablation, a validation comparison and a human-readable
-decision record.
+Wave 1 and the first Wave 2 implementation are complete pending independent
+review. The v2 local snapshot contains 62 features versus 44 in `features-v0`.
+On the current validation split, the fixed-feature baseline changed from
+25.34% to 25.45% AP for LightGBM and from 22.34% to 23.52% AP for Logistic
+Regression. These are descriptive results for this static benchmark; the
+feature-family ablation and multi-seed stability study are still required
+before calling the improvement robust.
+
+The main risk remains adding complexity without stable improvement. The
+scrollytelling now exposes the seed, fingerprint, feature versions, feature
+counts, and human explanation while the backend retains the technical contract.
 
 ## Version-control allowlist
 

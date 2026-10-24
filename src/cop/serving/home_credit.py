@@ -8,7 +8,12 @@ from typing import Any, cast
 
 import pandas as pd
 
+from cop.data.home_credit import (
+    HOME_CREDIT_FEATURE_VERSION_V0,
+    HOME_CREDIT_SPLIT_SEED,
+)
 from cop.evaluation.calibration import calibration_bins
+from cop.training.home_credit import HOME_CREDIT_EXPERIMENT_SEED
 
 
 def _json(path: Path) -> dict[str, Any]:
@@ -21,9 +26,25 @@ def _json(path: Path) -> dict[str, Any]:
 class HomeCreditService:
     """Expose cached local reports; this service never trains or opens test."""
 
-    def __init__(self, snapshot_directory: Path, run_directory: Path) -> None:
+    def __init__(
+        self,
+        snapshot_directory: Path,
+        run_directory: Path,
+        comparison_snapshot_directory: Path | None = None,
+        comparison_run_directory: Path | None = None,
+    ) -> None:
         self._snapshot_directory = snapshot_directory.resolve()
         self._run_directory = run_directory.resolve()
+        self._comparison_snapshot_directory = (
+            comparison_snapshot_directory.resolve()
+            if comparison_snapshot_directory is not None
+            else None
+        )
+        self._comparison_run_directory = (
+            comparison_run_directory.resolve()
+            if comparison_run_directory is not None
+            else None
+        )
 
     def summary(self) -> dict[str, Any]:
         manifest = _json(self._snapshot_directory / "manifest.json")
@@ -202,6 +223,14 @@ class HomeCreditService:
         policy_models = cast(dict[str, Any], policy["models"])
         lightgbm_policy = cast(list[dict[str, Any]], policy_models["lightgbm"])
         validation_prevalence = float(lightgbm_policy[0]["prevalence"])
+        feature_version = str(
+            manifest.get("feature_version", HOME_CREDIT_FEATURE_VERSION_V0)
+        )
+        split_seed = int(manifest.get("split_seed", HOME_CREDIT_SPLIT_SEED))
+        experiment_seed = int(
+            baseline.get("experiment_seed", HOME_CREDIT_EXPERIMENT_SEED)
+        )
+        cv_folds = int(model_lab["folds"])
         calibration_models = []
         for name in ("logistic_regression", "lightgbm"):
             calibration_models.append(
@@ -214,7 +243,7 @@ class HomeCreditService:
                     ),
                 }
             )
-        return {
+        evidence: dict[str, Any] = {
             "dataset": {
                 "name": "Home Credit Default Risk",
                 "dataset_id": manifest["dataset_id"],
@@ -235,6 +264,20 @@ class HomeCreditService:
                 "test_status": baseline["test_status"],
                 "split_strategy": manifest["static_split_strategy"],
                 "split_rows": manifest["split_rows"],
+            },
+            "reproducibility": {
+                "feature_version": feature_version,
+                "dataset_fingerprint": manifest["logical_sha256"],
+                "split_seed": split_seed,
+                "experiment_seed": experiment_seed,
+                "cross_validation_folds": cv_folds,
+                "split_strategy": manifest["static_split_strategy"],
+                "human_explanation": (
+                    "The seed makes the split and experiment repeatable; it does "
+                    "not make the model more accurate. Confidence comes from "
+                    "checking whether the result remains stable across folds and "
+                    "future seeds."
+                ),
             },
             "feature_groups": feature_groups,
             "audit_only": {
@@ -296,4 +339,68 @@ class HomeCreditService:
             },
             "test_status": "unopened",
             "authorized_use": "academic_static_benchmark_only",
+        }
+        evidence["feature_comparison"] = self._feature_comparison()
+        return evidence
+
+    def _feature_comparison(self) -> dict[str, Any]:
+        """Compare the frozen baseline with an optional local feature challenger."""
+        if (
+            self._comparison_snapshot_directory is None
+            or self._comparison_run_directory is None
+        ):
+            return {
+                "status": "unavailable",
+                "reason": "No versioned feature challenger has been materialized.",
+            }
+        manifest_path = self._comparison_snapshot_directory / "manifest.json"
+        result_path = self._comparison_run_directory / "results.json"
+        if not manifest_path.exists() or not result_path.exists():
+            return {
+                "status": "unavailable",
+                "reason": "The feature challenger artifacts are not available.",
+            }
+        challenger_manifest = _json(manifest_path)
+        challenger_result = _json(result_path)
+        baseline_result = _json(self._run_directory / "results.json")
+        models: list[dict[str, Any]] = []
+        for name, result in cast(dict[str, Any], challenger_result["models"]).items():
+            baseline_model = cast(dict[str, Any], baseline_result["models"][name])
+            baseline_ap = float(baseline_model["validation"]["average_precision"])
+            challenger_ap = float(result["validation"]["average_precision"])
+            models.append(
+                {
+                    "model": name,
+                    "baseline_validation_average_precision": baseline_ap,
+                    "challenger_validation_average_precision": challenger_ap,
+                    "validation_average_precision_delta": challenger_ap - baseline_ap,
+                    "decision": (
+                        "challenger_improves_validation_ap"
+                        if challenger_ap > baseline_ap
+                        else "baseline_remains_stronger"
+                    ),
+                }
+            )
+        return {
+            "status": "available",
+            "baseline_feature_version": str(
+                _json(self._snapshot_directory / "manifest.json").get(
+                    "feature_version", HOME_CREDIT_FEATURE_VERSION_V0
+                )
+            ),
+            "challenger_feature_version": str(
+                challenger_manifest.get("feature_version", "unknown")
+            ),
+            "baseline_feature_count": len(
+                _json(self._snapshot_directory / "manifest.json")["model_features"]
+            ),
+            "challenger_feature_count": len(challenger_manifest["model_features"]),
+            "models": models,
+            "test_status": "unopened",
+            "human_explanation": (
+                "The challenger adds versioned features while keeping the dataset "
+                "split, primary metric, and validation boundary unchanged. A "
+                "higher validation AP is evidence of improvement for this static "
+                "benchmark, not a production guarantee."
+            ),
         }
