@@ -15,16 +15,13 @@ import pandas as pd
 from sklearn.metrics import roc_curve  # type: ignore[import-untyped]
 from sklearn.pipeline import Pipeline  # type: ignore[import-untyped]
 
-from cop.evaluation.academic import run_academic_study
 from cop.evaluation.calibration import calibration_bins
-from cop.evaluation.model_lab import run_model_lab
 from cop.evaluation.policy import capacity_metrics
 from cop.features.uci import UCI_APPROVED_FEATURES
 from cop.training.config import BaselineConfig, load_baseline_config
 from cop.training.uci_baseline import (
     MODEL_NAMES,
     load_development_data,
-    train_development,
 )
 
 
@@ -43,9 +40,22 @@ class AcademicArtifacts:
 
 @lru_cache(maxsize=1)
 def load_academic_artifacts(config_path: str) -> AcademicArtifacts:
-    """Load or create local academic artifacts without opening the test split."""
+    """Load frozen local academic artifacts without training on request."""
     config = load_baseline_config(Path(config_path))
-    run_directory = train_development(Path(config_path))
+    candidates = []
+    for directory in sorted(config.run_root.glob("*/")):
+        manifest_path = directory / "run-manifest.json"
+        if not manifest_path.exists():
+            continue
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if manifest.get("test_status") == "unopened":
+            candidates.append(directory)
+    if not candidates:
+        raise FileNotFoundError(
+            "No frozen UCI development artifact is available; run the training "
+            "CLI offline."
+        )
+    run_directory = candidates[-1]
     manifest = json.loads(
         (run_directory / "run-manifest.json").read_text(encoding="utf-8")
     )
@@ -58,7 +68,16 @@ def load_academic_artifacts(config_path: str) -> AcademicArtifacts:
     }
     if not all(isinstance(model, Pipeline) for model in models.values()):
         raise TypeError("Academic artifacts must contain sklearn pipelines")
-    study_directory = run_academic_study(Path(config_path))
+    study_candidates = sorted(
+        path
+        for path in (config.run_root.parent / "academic-study").glob("*/")
+        if (path / "study-results.json").exists()
+    )
+    if not study_candidates:
+        raise FileNotFoundError(
+            "No frozen academic study is available; run the study CLI offline."
+        )
+    study_directory = study_candidates[-1]
     study_results = json.loads(
         (study_directory / "study-results.json").read_text(encoding="utf-8")
     )
@@ -80,8 +99,17 @@ def load_academic_artifacts(config_path: str) -> AcademicArtifacts:
 
 @lru_cache(maxsize=2)
 def load_model_lab_results(config_path: str) -> dict[str, Any]:
-    """Run the explicit academic lab once per configuration and cache its report."""
-    return run_model_lab(Path(config_path), folds=3)
+    """Load the materialized model-lab report; never run it in the API."""
+    config = load_baseline_config(Path(config_path))
+    report_path = config.run_root.parent / "uci-model-lab" / "model-lab-results.json"
+    if not report_path.exists():
+        raise FileNotFoundError(
+            "No frozen model-lab artifact is available; run the lab CLI offline."
+        )
+    value = json.loads(report_path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError("model-lab artifact must contain a JSON object")
+    return value
 
 
 class AcademicService:

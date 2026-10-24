@@ -288,6 +288,7 @@ class HomeCreditService:
             },
             "models": model_evidence,
             "iterations": iterations,
+            "classical_benchmark": self._classical_benchmark(),
             "policy": {
                 "capacities": policy["capacities"],
                 "models": policy["models"],
@@ -343,6 +344,61 @@ class HomeCreditService:
         evidence["feature_comparison"] = self._feature_comparison()
         return evidence
 
+    def _classical_benchmark(self) -> dict[str, Any]:
+        """Expose the cached classical tuning evidence without training on request."""
+        report_paths = [self._run_directory.parent / "model-benchmark-v2.json"]
+        if self._comparison_run_directory is not None:
+            report_paths.append(
+                self._comparison_run_directory.parent / "model-benchmark-v2.json"
+            )
+        report_path = next((path for path in report_paths if path.exists()), None)
+        if report_path is None:
+            return {
+                "status": "unavailable",
+                "reason": "The classical benchmark has not been materialized.",
+            }
+        report = _json(report_path)
+        models = []
+        for name, payload in cast(dict[str, Any], report["models"]).items():
+            validation = payload.get("validation")
+            cv = payload.get("cross_validation")
+            models.append(
+                {
+                    "model": name,
+                    "status": payload.get("status", "available"),
+                    "validation_average_precision": (
+                        validation.get("average_precision")
+                        if isinstance(validation, dict)
+                        else None
+                    ),
+                    "cross_validation_average_precision": (
+                        cv.get("average_precision") if isinstance(cv, dict) else None
+                    ),
+                    "cross_validation_std": payload.get("cross_validation_std"),
+                    "parameters": payload.get("parameters", {}),
+                    "search": payload.get("search", "fixed challenger"),
+                    "trials": payload.get("trial_history", []),
+                    "reason": payload.get("reason"),
+                }
+            )
+        return {
+            "status": "available",
+            "primary_metric": report["primary_metric"],
+            "fit_split": report["fit_split"],
+            "selection_split": report["selection_split"],
+            "evaluation_split": report["evaluation_split"],
+            "experiment_seed": report["experiment_seed"],
+            "cross_validation_folds": report["cross_validation_folds"],
+            "models": models,
+            "test_status": report["test_status"],
+            "human_explanation": (
+                "Optuna searches LightGBM parameters inside train cross-validation. "
+                "Validation is checked after selection, while CatBoost and XGBoost "
+                "act as fixed classical challengers. The highest validation score "
+                "is evidence for this split, not an automatic promotion."
+            ),
+        }
+
     def _feature_comparison(self) -> dict[str, Any]:
         """Compare the frozen baseline with an optional local feature challenger."""
         if (
@@ -363,6 +419,9 @@ class HomeCreditService:
         challenger_manifest = _json(manifest_path)
         challenger_result = _json(result_path)
         baseline_result = _json(self._run_directory / "results.json")
+        ablation_path = (
+            self._comparison_run_directory.parent / "feature-ablation-results.json"
+        )
         models: list[dict[str, Any]] = []
         for name, result in cast(dict[str, Any], challenger_result["models"]).items():
             baseline_model = cast(dict[str, Any], baseline_result["models"][name])
@@ -381,6 +440,20 @@ class HomeCreditService:
                     ),
                 }
             )
+        ablation: dict[str, Any]
+        if ablation_path.exists():
+            ablation_report = _json(ablation_path)
+            ablation = {
+                "status": "available",
+                "model": ablation_report["model"],
+                "primary_metric": ablation_report["primary_metric"],
+                "results": ablation_report["results"],
+            }
+        else:
+            ablation = {
+                "status": "unavailable",
+                "reason": "No feature-family ablation report has been materialized.",
+            }
         return {
             "status": "available",
             "baseline_feature_version": str(
@@ -396,6 +469,7 @@ class HomeCreditService:
             ),
             "challenger_feature_count": len(challenger_manifest["model_features"]),
             "models": models,
+            "ablation": ablation,
             "test_status": "unopened",
             "human_explanation": (
                 "The challenger adds versioned features while keeping the dataset "

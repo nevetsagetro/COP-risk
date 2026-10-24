@@ -4,8 +4,8 @@ language: en
 project: COP Home Credit Model Improvement Roadmap
 objective: >-
   Improve the Home Credit academic benchmark through reproducible feature
-  engineering, classical model benchmarking, optional deep learning,
-  robustness, explainability, and portfolio delivery.
+  engineering, classical model benchmarking, tuning, and portfolio UX/UI
+  delivery. Deep learning is deferred to a future sprint.
 status: active
 waves:
   - id: wave-01-baseline-audit
@@ -120,7 +120,9 @@ waves:
         status: proposed
   - id: wave-04-deep-learning
     name: Deep learning benchmark
-    purpose: Test whether a controlled tabular neural baseline adds evidence beyond classical models.
+    purpose: >-
+      Future sprint: test whether a controlled tabular neural baseline adds
+      evidence beyond classical models.
     exit_criteria:
       - MLP scope, seed, preprocessing, and stopping rules are documented.
       - Training and learning curves are reproducible.
@@ -133,28 +135,28 @@ waves:
         depends_on: [HC33-012]
         allowed_paths: [docs/plans/, docs/decisions/, src/cop/training/, tests/]
         prohibited_paths: [data/, runs/, app/web/]
-        status: proposed
+        status: deferred_to_future_sprint
       - id: HC33-014
         title: Implement reproducible MLP training and evaluation
         agent: data_ml
         depends_on: [HC33-013]
         allowed_paths: [src/cop/training/, src/cop/evaluation/, scripts/, tests/]
         prohibited_paths: [data/, runs/, app/web/]
-        status: proposed
+        status: deferred_to_future_sprint
       - id: HC33-015
         title: Compare learning curves and model evidence
         agent: coordinator
         depends_on: [HC33-014]
         allowed_paths: [src/cop/evaluation/, app/web/, tests/, docs/model-cards/]
         prohibited_paths: [data/, runs/, src/cop/api.py]
-        status: proposed
+        status: deferred_to_future_sprint
       - id: HC33-016
         title: Review deep-learning claims and resource cost
         agent: reviewer
         depends_on: [HC33-014, HC33-015]
         allowed_paths: [docs/, src/, tests/]
         prohibited_paths: [data/, runs/, .git/]
-        status: proposed
+        status: deferred_to_future_sprint
   - id: wave-05-robustness-explainability
     name: Explainability and robustness
     purpose: Test reliability, calibration, error patterns, and interpretation without unsupported claims.

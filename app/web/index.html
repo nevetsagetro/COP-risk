@@ -76,12 +76,12 @@
 
         <article class="home-chapter" id="home-chapter-features" data-story-chapter tabindex="-1">
           <div class="home-chapter-copy"><span class="chapter-number">03 · FEATURE CONSTRUCTION</span><h2>How does raw data become model input?</h2><p>The pipeline keeps the application table as the anchor and adds grouped aggregates from public historical tables. The groups describe the engineering path; they do not establish causality.</p><div class="story-checkpoint"><b>Feature contract</b><span>Audit-only columns remain outside model inputs.</span></div></div>
-          <div class="home-chapter-stage"><div id="home-feature-groups" class="feature-story-grid"></div><div id="home-feature-comparison" class="reproducibility-card" aria-live="polite">Loading feature comparison…</div><p id="home-audit-only" class="technical-note"></p><p class="technical-note">The groups are feature provenance, not a feature-importance claim.</p></div>
+          <div class="home-chapter-stage"><div id="home-feature-groups" class="feature-story-grid"></div><div id="home-feature-comparison" class="reproducibility-card" aria-live="polite">Loading feature comparison…</div><div id="home-feature-ablation-chart" class="chart chart-wide" role="img" aria-label="Home Credit feature-family ablation chart"></div><p id="home-audit-only" class="technical-note"></p><p class="technical-note">The groups are feature provenance, not a feature-importance claim.</p></div>
         </article>
 
         <article class="home-chapter" id="home-chapter-models" data-story-chapter tabindex="-1">
           <div class="home-chapter-copy"><span class="chapter-number">04 · MODEL ITERATIONS</span><h2>How did the candidate improve?</h2><p>Each point is a controlled trial. The mean shows train cross-validation Average Precision; the whisker shows fold variation. The selected point is the best candidate under the declared primary metric.</p><div class="story-checkpoint"><b>Selection rule</b><span>Choose by train-CV Average Precision, then inspect validation once.</span></div></div>
-          <div class="home-chapter-stage"><div class="academic-process" aria-label="Model development process"><article><b>1 · Define</b><span>Freeze data, features, seed and metric.</span></article><article><b>2 · Fit</b><span>Train candidates inside the training split.</span></article><article><b>3 · Compare</b><span>Use cross-validation to select a candidate.</span></article><article><b>4 · Check</b><span>Use validation once to test the conclusion.</span></article></div><div id="home-trial-chart" class="chart chart-wide" role="img" aria-label="Home Credit model trial comparison"></div><p id="home-iteration-result" class="lab-conclusion" aria-live="polite">Loading the iteration result…</p><div id="home-iteration-summary" class="model-cards"></div><div class="table-wrap"><table id="home-iteration-table"><thead><tr><th>Model</th><th>Iteration</th><th>Parameters</th><th>CV AP</th><th>Fold variation</th><th>Rank</th><th>Validation AP</th></tr></thead><tbody></tbody></table></div></div>
+          <div class="home-chapter-stage"><div class="academic-process" aria-label="Model development process"><article><b>1 · Define</b><span>Freeze data, features, seed and metric.</span></article><article><b>2 · Fit</b><span>Train candidates inside the training split.</span></article><article><b>3 · Compare</b><span>Use cross-validation to select a candidate.</span></article><article><b>4 · Check</b><span>Use validation once to test the conclusion.</span></article></div><div id="home-trial-chart" class="chart chart-wide" role="img" aria-label="Home Credit model trial comparison"></div><div id="home-classical-benchmark" class="reproducibility-card" aria-live="polite">Loading classical benchmark…</div><div id="home-classical-benchmark-chart" class="chart chart-wide" role="img" aria-label="Classical model benchmark validation comparison"></div><p id="home-iteration-result" class="lab-conclusion" aria-live="polite">Loading the iteration result…</p><div id="home-iteration-summary" class="model-cards"></div><div class="table-wrap"><table id="home-iteration-table"><thead><tr><th>Model</th><th>Iteration</th><th>Parameters</th><th>CV AP</th><th>Fold variation</th><th>Rank</th><th>Validation AP</th></tr></thead><tbody></tbody></table></div></div>
         </article>
 
         <article class="home-chapter" id="home-chapter-validation" data-story-chapter tabindex="-1">
@@ -134,7 +134,7 @@
       <section class="panel" id="model-lab-panel">
         <div class="section-heading"><div><div class="eyebrow">UCI REFERENCE MODEL DEVELOPMENT</div><h2>How did the original reference baseline improve?</h2></div><button id="run-model-lab" class="button" type="button" hidden>Retry experiment</button></div>
         <p class="lead">This preserved reference experiment compares Logistic Regression, LightGBM and KNN on the original UCI baseline. The primary Home Credit results are shown in the static benchmark panel below.</p>
-        <p id="model-lab-status" class="lab-status" role="status">Preparing the cached academic experiment in the background…</p>
+        <p id="model-lab-status" class="lab-status" role="status">Loading the cached academic experiment…</p>
         <div id="model-lab-results" hidden>
           <div class="lab-flow" aria-label="Experiment flow"><article><b>1 · Search space</b><span>Define controlled parameter combinations.</span></article><article><b>2 · Cross-validation</b><span>Fit every trial across train folds.</span></article><article><b>3 · Select</b><span>Rank by Average Precision, then ROC-AUC.</span></article><article><b>4 · Validate</b><span>Evaluate the selected trial once on validation.</span></article></div>
           <p id="model-lab-conclusion" class="lab-conclusion"></p>
@@ -204,7 +204,7 @@
       </div>
     </main>
     <footer>Home Credit Default Risk · static academic benchmark · UCI retained as reference · final tests closed</footer>
-    <script src="/assets/app.js?v=model-lab-28"></script>
+    <script src="/assets/app.js?v=model-lab-30"></script>
     <script src="/assets/language.js?v=toggle-5"></script>
   </body>
 </html>

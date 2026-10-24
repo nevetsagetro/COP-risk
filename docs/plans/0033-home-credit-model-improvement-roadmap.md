@@ -7,14 +7,34 @@
 - Última actualización: 2026-10-25.
 - Responsable: agente `coordinator`.
 - Alcance: evolución controlada del benchmark académico Home Credit desde el
-  baseline actual hasta un informe reproducible de modelos clásicos y deep
-  learning.
+  baseline actual hasta un primer milestone reproducible de features, tuning
+  clásico y presentación UX/UI. Deep learning queda planificado para un sprint
+  posterior y no forma parte del primer tag.
 - Fuente normativa: `AGENTS.md`, `PLANS.md`, ADR-0031, el plan 0032 y el
   roadmap solicitado por el usuario.
 
-Este documento es un roadmap propuesto. No autoriza todavía añadir nuevas
-dependencias, abrir el test, crear un champion ni presentar los resultados como
+Este documento es un roadmap activo. El primer milestone autoriza la evidencia
+de features v2, ablation, tuning clásico y su integración en el frontend. No
+autoriza abrir el test, crear un champion ni presentar los resultados como
 capacidad productiva.
+
+### Boundary of the first milestone
+
+The first milestone closes Waves 1–3 plus the UX/UI storytelling required to
+explain them. It includes Logistic Regression and LightGBM references, Optuna
+tuning, CatBoost/XGBoost classical challengers when their optional dependencies
+are installed, feature-family ablation, cached artifacts, API exposure, and
+human-readable scrollytelling. PyTorch/deep learning is explicitly deferred to
+the next sprint and is excluded from the milestone commit and tag.
+
+### Runtime contract
+
+Training, feature construction, cross-validation, tuning and benchmark
+generation are offline jobs. They write versioned artifacts under `runs/` and
+are never invoked by FastAPI, static asset loading, or browser interaction.
+The app reads materialized JSON/CSV evidence and renders it as a fast flat
+analytical view. Reproduction is performed by the CLI scripts with the recorded
+dataset fingerprint, feature version, split seed and experiment seed.
 
 ## Propósito y resultado observable
 
@@ -98,9 +118,10 @@ datos, training y evaluación:
 - Comparar class weighting y SMOTE-Tomek como challengers dentro de los folds.
 - Mostrar parámetros, seeds, tiempos, folds, métricas y decisión de cada trial.
 
-### Wave 4 — Deep Learning benchmark
+### Wave 4 — Deep Learning benchmark (future sprint)
 
-- Implementar un MLP tabular en PyTorch como benchmark académico separado.
+- Implementar un MLP tabular en PyTorch como benchmark académico separado en un
+  sprint posterior; queda fuera del primer milestone.
 - Registrar curvas de aprendizaje, early stopping, seed y número de parámetros.
 - Comparar contra el mejor modelo clásico usando exactamente los mismos splits
   y métricas.
@@ -189,9 +210,10 @@ owner, dependencias, allowlist y estado independiente.
 2. Implementar una feature family por iteración, empezando por ratios y
    terminando cada una con ablación.
 3. Ejecutar benchmark clásico antes de considerar deep learning.
-4. Añadir el MLP sólo si la comparación clásica está estable y documentada.
-5. Completar robustez y explainability antes de actualizar la historia pública.
-6. Cerrar con validación completa, revisión, model card y finisher.
+4. Integrar la evidencia clásica en la historia pública y cerrar el primer
+   milestone con validación completa, revisión y finisher.
+5. Reabrir Wave 4 en un sprint posterior; no mezclar su implementación con el
+   primer tag.
 
 ## Validación y criterios de aceptación
 
@@ -226,9 +248,9 @@ Wave-specific evidence must include:
 - [x] Current baseline and missing reproducibility metadata audited.
 - [x] Wave 1 baseline contract implementation.
 - [x] Wave 2 Feature Engineering v2 snapshot and API/frontend comparison.
-- [ ] Wave 2 feature-family ablation report.
-- [ ] Wave 3 Model Benchmark v2.
-- [ ] Wave 4 Deep Learning benchmark.
+- [x] Wave 2 feature-family ablation report.
+- [x] Wave 3 Model Benchmark v2.
+- [ ] Wave 4 Deep Learning benchmark (deferred to future sprint).
 - [ ] Wave 5 Explainability and robustness.
 - [ ] Wave 6 Portfolio and final delivery.
 
@@ -250,6 +272,10 @@ Wave-specific evidence must include:
 - 2026-10-25 — The test remains closed across all six waves.
 - 2026-10-25 — Feature versions and iteration records must preserve the
   baseline instead of overwriting it.
+- 2026-10-25 — Training, tuning and CV are offline artifact-generation jobs;
+  serving and the browser are read-only consumers of cached reports.
+- 2026-10-25 — Deep learning is deferred to a future sprint and separated into
+  its own optional dependency group; it is excluded from this milestone tag.
 
 ## Resultados y retrospectiva
 
@@ -257,13 +283,21 @@ Wave 1 and the first Wave 2 implementation are complete pending independent
 review. The v2 local snapshot contains 62 features versus 44 in `features-v0`.
 On the current validation split, the fixed-feature baseline changed from
 25.34% to 25.45% AP for LightGBM and from 22.34% to 23.52% AP for Logistic
-Regression. These are descriptive results for this static benchmark; the
-feature-family ablation and multi-seed stability study are still required
-before calling the improvement robust.
+Regression. The cached classical benchmark reports validation AP of 23.52%
+for Logistic Regression, 25.58% for tuned LightGBM, 25.58% for CatBoost and
+25.93% for XGBoost. These are descriptive results for this static benchmark;
+they do not establish a production winner or robust multi-seed improvement.
 
-The main risk remains adding complexity without stable improvement. The
-scrollytelling now exposes the seed, fingerprint, feature versions, feature
-counts, and human explanation while the backend retains the technical contract.
+The UCI model-lab is also materialized under `runs/uci-model-lab/`; the API
+now reads it instead of calling the training function. The Home Credit service
+likewise reads the cached baseline, feature-ablation and classical benchmark
+reports. A missing artifact produces an explicit unavailable response.
+
+The feature-family ablation and classical benchmark are cached locally and are
+shown in the scrollytelling. The frontend explains the engineering process in
+human language while the backend retains seeds, parameters, folds, trial
+history, and the closed-test contract. Deep learning remains a documented
+future sprint rather than an unverified capability of this tag.
 
 ## Version-control allowlist
 
@@ -272,7 +306,6 @@ Tracked files or directories allowed:
 - docs/plans/0033-home-credit-model-improvement-roadmap.md
 - docs/workflows/0033-home-credit-model-improvement.yaml
 - docs/decisions/
-- docs/model-cards/
 - src/cop/data/
 - src/cop/evaluation/
 - src/cop/training/
@@ -282,6 +315,7 @@ Tracked files or directories allowed:
 - tests/
 - app/web/
 - README.md
+- pyproject.toml
 
 Generated artifacts forbidden:
 

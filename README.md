@@ -204,6 +204,17 @@ python3 scripts/run_mvp_demo.py --json
 
 Este es un MVP académico local, no un sistema de decisión crediticia.
 
+### Home Credit model-improvement milestone
+
+The Home Credit academic story is backed by offline artifacts. Feature
+engineering, ablation, cross-validation, Optuna tuning and classical challenger
+training run through explicit CLI jobs and save JSON/CSV evidence under
+`runs/`. FastAPI and the browser only read those cached artifacts; opening the
+demo never retrains a model or runs tuning. Reproduce a report by rerunning the
+corresponding script with its recorded dataset fingerprint, feature version,
+split seed and experiment seed. The first milestone covers classical models
+and UX/UI storytelling. Deep learning is a separate future sprint.
+
 ### Presentación Streamlit
 
 La interfaz opcional combina una vista de resultados académicos con tablas y
