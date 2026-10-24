@@ -52,9 +52,40 @@ Cada ExecPlan debe contener, en este orden:
     requieren además un ADR.
 13. **Resultados y retrospectiva**: resultados reales, desviaciones,
     validaciones ejecutadas y riesgos restantes.
+14. **Version-control allowlist**: rutas concretas que pueden formar parte del
+    cierre, artefactos generados prohibidos y mensaje de commit esperado.
 
 Si una sección no aplica, debe permanecer con una explicación breve; no se
 elimina.
+
+## Formato obligatorio de la allowlist
+
+Cada ExecPlan técnico contiene exactamente esta sección, con rutas POSIX
+relativas. Un directorio termina en `/` y autoriza solo sus descendientes. No
+se permiten globs en la lista permitida.
+
+```markdown
+## Version-control allowlist
+
+Tracked files or directories allowed:
+
+- path/example.py
+- docs/example.md
+
+Generated artifacts forbidden:
+
+- data/**
+- models/**
+- reports/local/**
+
+Expected commit message:
+
+- feat(scope): description
+```
+
+La allowlist es la única fuente del staging automatizado y nunca autoriza
+datos, secretos, entornos, caches, modelos, predicciones o runs. El commit
+requiere autorización humana explícita; nunca se usa `git add .`.
 
 ## Reglas de mantenimiento
 
