@@ -1,0 +1,155 @@
+workflow_version: 1
+workflow_id: home-credit-academic-evidence-lab
+language: en
+project: COP Home Credit Academic Evidence Lab
+objective: >-
+  Turn the Home Credit summary page into an academic motion-graphic
+  scrollytelling experience that shows data, feature construction, model
+  iterations, validation, policy trade-offs, and future improvement evidence.
+status: active
+waves:
+  - id: wave-01-story-contract
+    name: Story architecture and evidence contract
+    purpose: Define the scroll narrative and verify what the repository can support.
+    exit_criteria:
+      - Every chapter has a question, evidence source, and limitation.
+      - Missing evidence is represented as missing, never fabricated.
+      - Motion and reduced-motion behavior are defined.
+    tasks:
+      - id: HC32-001
+        title: Audit Home Credit evidence sources
+        agent: data_ml
+        depends_on: []
+        allowed_paths: [docs/plans/, docs/datasets/, runs/]
+        prohibited_paths: [app/web/, src/cop/api.py]
+        status: complete_pending_review
+      - id: HC32-002
+        title: Design the scroll narrative and motion states
+        agent: coordinator
+        depends_on: [HC32-001]
+        allowed_paths: [docs/plans/, app/web/]
+        prohibited_paths: [data/, runs/, src/cop/training/]
+        status: complete_pending_review
+      - id: HC32-003
+        title: Review claims and academic boundaries
+        agent: reviewer
+        depends_on: [HC32-001, HC32-002]
+        allowed_paths: [docs/plans/, docs/decisions/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: blocked_on_HC32-001
+  - id: wave-02-evidence-api
+    name: Academic evidence API
+    purpose: Expose one stable read-only response for all Home Credit chapters.
+    exit_criteria:
+      - Existing Home Credit API behavior remains compatible.
+      - Trials, validation, policy, and test state are preserved.
+      - API tests prove artifacts are read-only and test remains closed.
+    tasks:
+      - id: HC32-004
+        title: Build the academic evidence contract
+        agent: mlops
+        depends_on: [HC32-003]
+        allowed_paths: [src/cop/serving/, src/cop/api.py, tests/integration/]
+        prohibited_paths: [data/, src/cop/training/, app/web/]
+        status: complete_pending_review
+      - id: HC32-005
+        title: Add iteration and chart-data tests
+        agent: data_ml
+        depends_on: [HC32-004]
+        allowed_paths: [tests/unit/, tests/integration/, src/cop/evaluation/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: complete_pending_review
+      - id: HC32-006
+        title: Review API and artifact boundaries
+        agent: reviewer
+        depends_on: [HC32-004, HC32-005]
+        allowed_paths: [docs/plans/, src/cop/serving/, tests/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: blocked_on_HC32-003
+  - id: wave-03-scroll-motion
+    name: Scroll shell and motion system
+    purpose: Implement the academic evidence story as accessible scrollytelling.
+    exit_criteria:
+      - Chapters, active navigation, checkpoints, and reduced motion work.
+      - Dataset, feature, and model iteration evidence are visible.
+      - Charts remain inspectable while transitions run.
+    tasks:
+      - id: HC32-007
+        title: Implement chapter navigation and scroll state
+        agent: coordinator
+        depends_on: [HC32-006]
+        allowed_paths: [app/web/, tests/integration/]
+        prohibited_paths: [data/, src/cop/training/]
+        status: complete_pending_review
+      - id: HC32-008
+        title: Implement dataset and feature chapters
+        agent: coordinator
+        depends_on: [HC32-007]
+        allowed_paths: [app/web/, tests/integration/]
+        prohibited_paths: [data/, src/cop/training/]
+        status: complete_pending_review
+      - id: HC32-009
+        title: Implement model iteration chapter
+        agent: coordinator
+        depends_on: [HC32-007]
+        allowed_paths: [app/web/, tests/integration/]
+        prohibited_paths: [data/, src/cop/training/]
+        status: complete_pending_review
+  - id: wave-04-validation-policy
+    name: Validation, policy, and future iteration seam
+    purpose: Show how evidence changes through validation and bounded policy.
+    exit_criteria:
+      - Validation and calibration are clearly separated from train-CV.
+      - Capacity trade-offs are animated without changing calculations.
+      - Future model iterations have an explicit comparison shape.
+    tasks:
+      - id: HC32-010
+        title: Implement validation and calibration evidence
+        agent: data_ml
+        depends_on: [HC32-006]
+        allowed_paths: [src/cop/evaluation/, src/cop/serving/, tests/]
+        prohibited_paths: [data/, app/web/]
+        status: complete_pending_review
+      - id: HC32-011
+        title: Implement capacity policy motion
+        agent: coordinator
+        depends_on: [HC32-010, HC32-009]
+        allowed_paths: [app/web/, tests/integration/]
+        prohibited_paths: [data/, src/cop/training/]
+        status: complete_pending_review
+      - id: HC32-012
+        title: Add future iteration comparison state
+        agent: mlops
+        depends_on: [HC32-006]
+        allowed_paths: [src/cop/serving/, src/cop/api.py, app/web/, tests/]
+        prohibited_paths: [data/, runs/, src/cop/training/]
+        status: complete_pending_review
+      - id: HC32-013
+        title: Review the complete evidence story
+        agent: reviewer
+        depends_on: [HC32-008, HC32-009, HC32-011, HC32-012]
+        allowed_paths: [docs/, src/, app/, tests/]
+        prohibited_paths: [data/, runs/, .git/]
+        status: blocked_on_HC32-008
+  - id: wave-05-closure
+    name: Accessibility, regression, and closure
+    purpose: Validate the complete motion story without functional regressions.
+    exit_criteria:
+      - Responsive, language, keyboard, and reduced-motion checks pass.
+      - Full fixed validations pass.
+      - Only allowlisted paths are eligible for closure.
+    tasks:
+      - id: HC32-014
+        title: Run responsive language and accessibility pass
+        agent: coordinator
+        depends_on: [HC32-013]
+        allowed_paths: [app/web/, tests/integration/, docs/]
+        prohibited_paths: [data/, src/cop/training/]
+        status: blocked_on_HC32-013
+      - id: HC32-015
+        title: Run milestone validation and prepare closure
+        agent: milestone_finisher
+        depends_on: [HC32-014]
+        allowed_paths: [docs/plans/, docs/workflows/, scripts/finish_milestone.py]
+        prohibited_paths: [data/, runs/, models/, .git/]
+        status: blocked_on_HC32-014

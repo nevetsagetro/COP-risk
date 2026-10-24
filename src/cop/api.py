@@ -13,6 +13,7 @@ from fastapi.responses import HTMLResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
 from cop.serving.academic import AcademicService
+from cop.serving.home_credit import HomeCreditService
 
 CONFIG_PATH = Path(
     os.environ.get("COP_CONFIG_PATH", "configs/training/uci-baseline.yaml")
@@ -36,6 +37,24 @@ class PredictionRequest(BaseModel):
 @lru_cache(maxsize=1)
 def get_service() -> AcademicService:
     return AcademicService(CONFIG_PATH)
+
+
+@lru_cache(maxsize=1)
+def get_home_credit_service() -> HomeCreditService:
+    snapshot = Path(
+        os.environ.get("COP_HOME_CREDIT_SNAPSHOT", "data/processed/home-credit-static")
+    )
+    configured_run = os.environ.get("COP_HOME_CREDIT_RUN")
+    if configured_run:
+        run = Path(configured_run)
+    else:
+        candidates = sorted(Path("runs/home-credit-static").glob("*/results.json"))
+        if not candidates:
+            raise FileNotFoundError(
+                "Home Credit static baseline artifacts are not available"
+            )
+        run = candidates[-1].parent
+    return HomeCreditService(snapshot, run)
 
 
 app = FastAPI(
@@ -73,6 +92,14 @@ async def probabilities() -> dict[str, Any]:
     return get_service().probability_distribution()
 
 
+@app.get("/api/calibration")
+async def calibration() -> dict[str, Any]:
+    try:
+        return get_service().calibration()
+    except ValueError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+
+
 @app.get("/api/examples")
 async def examples() -> dict[str, Any]:
     return get_service().examples()
@@ -94,6 +121,37 @@ async def model_lab() -> dict[str, Any]:
         return get_service().model_lab()
     except ValueError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
+
+
+@app.get("/api/home-credit")
+async def home_credit() -> dict[str, Any]:
+    try:
+        return get_home_credit_service().summary()
+    except (FileNotFoundError, KeyError, ValueError) as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+
+
+@app.get("/api/home-credit/academic")
+async def home_credit_academic() -> dict[str, Any]:
+    try:
+        return get_home_credit_service().academic_evidence()
+    except (FileNotFoundError, KeyError, ValueError) as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+
+
+@app.get("/api/policy-capacity")
+async def policy_capacity(
+    capacity: float = Query(
+        0.10,
+        ge=0.01,
+        le=1.0,
+        description="Fraction of validation cases available for academic review.",
+    ),
+) -> dict[str, Any]:
+    try:
+        return get_service().capacity_policy(capacity)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
 
 
 @app.post("/api/predict")

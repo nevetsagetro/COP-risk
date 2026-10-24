@@ -1,0 +1,194 @@
+workflow_version: 1
+workflow_id: home-credit-decision-lab
+language: en
+project: COP Home Credit Decision Lab
+objective: >-
+  Build a leakage-safe academic decision lab that shows how a model is
+  selected, calibrated, evaluated, and exposed through an analytical demo.
+status: proposed
+waves:
+  - id: wave-01-data-gate
+    name: Data gate and contract
+    purpose: Verify provenance, rules, schema, target, and decision-time availability.
+    exit_criteria:
+      - Dataset provenance and usage rules are documented.
+      - Modelable columns and audit-only columns are separated.
+      - A defensible decision-time window is documented.
+      - The dataset is accepted or rejected with an ADR.
+    tasks:
+      - id: HC-001
+        title: Inspect acquisition and dataset rules
+        agent: data_ml
+        depends_on: []
+        allowed_paths:
+          - docs/datasets/
+          - docs/decisions/
+          - scripts/
+          - tests/
+        prohibited_paths:
+          - src/cop/serving/
+          - app/web/
+        status: complete_pending_review
+      - id: HC-002
+        title: Review data gate and write acceptance decision
+        agent: reviewer
+        depends_on: [HC-001]
+        allowed_paths:
+          - docs/decisions/
+          - docs/plans/
+        prohibited_paths:
+          - data/
+          - runs/
+          - src/cop/
+        status: complete
+  - id: wave-02-feature-pipeline
+    name: Feature pipeline
+    purpose: Create reproducible joins, aggregates, and temporal leakage tests.
+    exit_criteria:
+      - Snapshot and split manifests are reproducible.
+      - Every feature has a documented availability window.
+      - Leakage tests cover joins, target, and post-decision columns.
+    tasks:
+      - id: HC-003
+        title: Implement source adapter and snapshot contract
+        agent: data_ml
+        depends_on: [HC-002]
+        allowed_paths:
+          - src/cop/data/
+          - src/cop/features/
+          - scripts/
+          - tests/
+          - docs/datasets/
+        prohibited_paths:
+          - app/web/
+          - src/cop/api.py
+        status: complete_pending_review
+      - id: HC-004
+        title: Review feature leakage and temporal split
+        agent: reviewer
+        depends_on: [HC-003]
+        allowed_paths:
+          - docs/plans/
+          - docs/decisions/
+        prohibited_paths:
+          - data/
+          - runs/
+        status: blocked_on_HC-003
+  - id: wave-03-model-development
+    name: Model development and decision policy
+    purpose: Compare models and select an operating policy under bounded capacity.
+    exit_criteria:
+      - Baseline, tuned challenger, and calibration are reproducible.
+      - Model selection uses a declared primary decision metric.
+      - Precision@k, Recall@k, AP, Brier, and policy utility are reported.
+    tasks:
+      - id: HC-005
+        title: Build baseline and feature-engineered candidates
+        agent: data_ml
+        depends_on: [HC-004]
+        allowed_paths:
+          - src/cop/evaluation/
+          - src/cop/features/
+          - src/cop/training/
+          - scripts/
+          - tests/
+          - docs/model-card-*.md
+        prohibited_paths:
+          - src/cop/serving/
+          - app/web/
+        status: blocked_on_HC-004
+      - id: HC-006
+        title: Add experiment tracking and local artifact contract
+        agent: mlops
+        depends_on: [HC-005]
+        allowed_paths:
+          - src/cop/tracking/
+          - scripts/
+          - configs/
+          - docs/
+          - tests/
+        prohibited_paths:
+          - data/
+          - models/
+          - app/web/
+        status: blocked_on_HC-005
+      - id: HC-007
+        title: Review model selection and unsupported claims
+        agent: reviewer
+        depends_on: [HC-005, HC-006]
+        allowed_paths:
+          - docs/
+          - tests/
+        prohibited_paths:
+          - data/
+          - runs/
+          - src/cop/serving/
+        status: blocked_on_HC-005
+  - id: wave-04-analytical-demo
+    name: Analytical decision demo
+    purpose: Present the complete ML Engineer workflow in an English-first app.
+    exit_criteria:
+      - The app explains dataset, contract, splits, experiments, policy, and demo.
+      - Model and policy comparisons are visible without notebook execution.
+      - Loading, cache, error, and test-status states are explicit.
+    tasks:
+      - id: HC-008
+        title: Add decision-policy API contract
+        agent: mlops
+        depends_on: [HC-007]
+        allowed_paths:
+          - src/cop/api.py
+          - src/cop/serving/
+          - tests/integration/
+        prohibited_paths:
+          - src/cop/training/
+          - data/
+        status: blocked_on_HC-007
+      - id: HC-009
+        title: Implement analytical narrative and policy controls
+        agent: coordinator
+        depends_on: [HC-008]
+        allowed_paths:
+          - app/web/
+          - docs/
+          - tests/integration/
+        prohibited_paths:
+          - data/
+          - src/cop/training/
+        status: blocked_on_HC-008
+  - id: wave-05-review-and-close
+    name: Review and milestone closure
+    purpose: Independently review, validate, and close the allowlisted milestone.
+    exit_criteria:
+      - Read-only review has no unresolved critical or high findings.
+      - Fixed validations pass.
+      - Only allowlisted paths are staged.
+      - Human authorization exists before commit.
+    tasks:
+      - id: HC-010
+        title: Perform read-only milestone review
+        agent: reviewer
+        depends_on: [HC-009]
+        allowed_paths:
+          - docs/
+          - src/
+          - app/
+          - tests/
+        prohibited_paths:
+          - data/
+          - runs/
+          - .git/
+        status: blocked_on_HC-009
+      - id: HC-011
+        title: Run allowlisted validations and prepare closure
+        agent: milestone_finisher
+        depends_on: [HC-010]
+        allowed_paths:
+          - docs/plans/
+          - docs/workflows/
+          - scripts/finish_milestone.py
+        prohibited_paths:
+          - data/
+          - models/
+          - runs/
+        status: blocked_on_HC-010

@@ -3,56 +3,124 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>COP · Academic Credit-Risk Lab</title>
+    <title>COP · Home Credit Decision Lab</title>
     <link rel="stylesheet" href="/assets/styles.css" />
     <script src="/assets/plotly.min.js?v=english-1"></script>
   </head>
   <body>
     <header class="hero">
       <button id="language-toggle" class="language-toggle" type="button" aria-label="Switch to Spanish">ES</button>
-      <div class="eyebrow">PORTFOLIO · LOCAL ACADEMIC DEMO</div>
-      <h1>COP · Credit-Risk Lab</h1>
+      <div class="eyebrow">PORTFOLIO · STATIC ACADEMIC BENCHMARK</div>
+      <h1>COP · Home Credit Decision Lab</h1>
       <p class="hero-copy">
-        A visual walkthrough of how a model estimates the probability of a
-        default next month and how the result changes when the alert threshold moves.
+        A visual walkthrough of how a model is selected, evaluated and used to
+        prioritize a bounded review policy on the Home Credit benchmark.
       </p>
       <div class="warning">Not approved for real credit decisions.</div>
     </header>
 
     <main>
       <section class="story-grid" aria-label="Idea principal">
-        <article class="story-card"><span>01</span><h2>Predict</h2><p>The model estimates the probability of a default next month.</p></article>
-        <article class="story-card"><span>02</span><h2>Compare</h2><p>We check how many risk cases it finds and how many alerts are correct.</p></article>
-        <article class="story-card"><span>03</span><h2>Explore</h2><p>We move the threshold to see what we gain and what we give up.</p></article>
+        <article class="story-card"><span>01</span><h2>Inspect</h2><p>We verify the Home Credit snapshot, entity split and feature contract.</p></article>
+        <article class="story-card"><span>02</span><h2>Compare</h2><p>We search Logistic Regression and LightGBM candidates with train cross-validation.</p></article>
+        <article class="story-card"><span>03</span><h2>Prioritize</h2><p>We compare how many observed defaults each model finds under a review capacity.</p></article>
       </section>
       <section class="target-card panel">
-        <div class="eyebrow">WHAT THE MODEL PREDICTS</div>
-        <h2>Will a default be recorded next month?</h2>
-        <p>The academic dataset contains credit histories. For each case, the model returns an estimated probability of a <b>default next month</b>. It does not predict income, approval, or credit rejection.</p>
-        <div class="target-example"><span>Input</span><b>Payment history, balances and payments made</b><span>→</span><span>Output</span><b>Academic probability of a next-month default</b></div>
+        <div class="eyebrow">WHAT THE HOME CREDIT MODEL PREDICTS</div>
+        <h2>Can the supplied application be associated with the source target?</h2>
+        <p>The static benchmark uses the source-provided <b>TARGET</b> exactly as documented. It is an academic classification outcome, not a new prediction horizon and not a credit approval or rejection decision.</p>
+        <div class="target-example"><span>Input</span><b>Application data and prior-history aggregates</b><span>→</span><span>Output</span><b>Academic probability for the source TARGET</b></div>
       </section>
       <section class="quick-start panel">
         <div class="eyebrow">QUICK TOUR</div>
         <h2>If you only have two minutes</h2>
         <ol><li>Read the three metrics: <b>coverage</b>, <b>alert accuracy</b> and <b>balance</b>.</li><li>Compare both models in their cards without mixing their curves.</li><li>Move the threshold and watch what each model gains and loses.</li></ol>
-        <div class="jump-links"><a href="#journey-panel">0 · Follow the journey</a><a href="#metrics-panel">1 · Understand</a><a href="#roc-panel">2 · Rank</a><a href="#threshold-panel">3 · Experiment</a></div>
+        <div class="jump-links"><a href="#journey-panel">0 · Follow the journey</a><a href="#home-credit-panel">1 · Home Credit results</a><a href="#home-credit-policy-panel">2 · Decide under capacity</a><a href="#tab-uci-button">3 · UCI reference</a></div>
       </section>
 
       <section class="panel journey-panel" id="journey-panel">
         <div class="section-heading"><div><div class="eyebrow">THE FULL STORY</div><h2>From dataset to final model decision</h2></div><span class="pill">Academic evidence chain</span></div>
-        <p class="lead">COP keeps the reasoning visible: first we define what the data can support, then we train and compare models, and only then do we choose an academic operating point. Each step has a different role.</p>
+        <p class="lead">COP keeps the reasoning visible: first we define what the Home Credit data can support, then we build and compare models, and only then do we choose an academic operating policy. Each step has a different role.</p>
         <div class="journey-grid">
-          <article class="journey-step"><span>01 · DATASET</span><h3>Start with a public source</h3><p>UCI Default of Credit Card Clients, 30,000 rows and 19 approved input variables.</p><small>Target: <b>default_payment_next_month</b></small></article>
+          <article class="journey-step"><span>01 · DATASET</span><h3>Start with a public source</h3><p>Home Credit Default Risk, 307,511 applications and four source tables used for static aggregates.</p><small>Target: <b>TARGET as supplied</b></small></article>
           <article class="journey-step"><span>02 · CONTRACT</span><h3>Define what is allowed</h3><p>Missing values fail validation. Protected/audit-only attributes stay physically outside the model inputs.</p><small>Use: <b>academic baseline only</b></small></article>
-          <article class="journey-step"><span>03 · SPLITS</span><h3>Protect the evidence</h3><p>Train is used to fit and tune, validation compares decisions, and test remains unopened until explicit finalization.</p><small><b>21,000</b> train · <b>4,500</b> validation · <b>4,500</b> test</small></article>
-          <article class="journey-step"><span>04 · EXPERIMENT</span><h3>Try controlled candidates</h3><p>Logistic Regression, LightGBM and KNN are evaluated with reproducible cross-validation and recorded parameters.</p><small>Selection metric: <b>Average Precision</b></small></article>
-          <article class="journey-step"><span>05 · OPERATING POINT</span><h3>Translate scores into alerts</h3><p>The threshold is learned from train out-of-fold predictions; F1 explains the balance between coverage and alert accuracy.</p><small>Default reference: <b>0.50</b> · tuned threshold shown in Model Development</small></article>
-          <article class="journey-step journey-decision"><span>06 · DECISION</span><h3>Make a bounded academic conclusion</h3><p id="journey-decision">Run Model Development to identify the strongest candidate under the selected metric. This does not authorize production use.</p><small>Final test: <b>closed by default</b></small></article>
+          <article class="journey-step"><span>03 · SPLITS</span><h3>Protect the evidence</h3><p>Entity-disjoint train and validation splits support static comparison; test remains unopened until explicit finalization.</p><small><b>215,024</b> train · <b>46,281</b> validation · <b>46,206</b> test</small></article>
+          <article class="journey-step"><span>04 · EXPERIMENT</span><h3>Try controlled candidates</h3><p>Logistic Regression and LightGBM are evaluated with reproducible cross-validation and recorded parameters.</p><small>Selection metric: <b>Average Precision</b></small></article>
+          <article class="journey-step"><span>05 · OPERATING POLICY</span><h3>Prioritize under capacity</h3><p>Cases are ranked by estimated probability and the review budget is tested at 1%, 5%, 10% and 20%.</p><small>Primary policy view: <b>precision@capacity</b></small></article>
+          <article class="journey-step journey-decision"><span>06 · DECISION</span><h3>Make a bounded academic conclusion</h3><p id="journey-decision">LightGBM is currently strongest under the declared static validation protocol. This does not authorize production use.</p><small>Final test: <b>closed by default</b></small></article>
         </div>
       </section>
 
+      <nav class="dataset-tabs" aria-label="Dataset views" role="tablist">
+        <button class="dataset-tab is-active" id="tab-home-button" type="button" role="tab" aria-selected="true" aria-controls="tab-home">Home Credit Decision Lab</button>
+        <button class="dataset-tab" id="tab-uci-button" type="button" role="tab" aria-selected="false" aria-controls="tab-uci">UCI Reference Baseline</button>
+      </nav>
+
+      <div id="tab-home" class="dataset-tab-panel" role="tabpanel" aria-labelledby="tab-home-button">
+
+      <nav class="home-story-nav" aria-label="Home Credit evidence chapters">
+        <a href="#home-chapter-context">01 · Context</a><a href="#home-chapter-data">02 · Data</a><a href="#home-chapter-features">03 · Features</a><a href="#home-chapter-models">04 · Iterations</a><a href="#home-chapter-validation">05 · Validation</a><a href="#home-chapter-policy">06 · Policy</a><a href="#home-chapter-conclusion">07 · Conclusion</a>
+      </nav>
+
+      <section class="home-story" id="home-academic-story" aria-label="Home Credit academic evidence story">
+        <p id="home-academic-status" class="lab-status" role="status" aria-live="polite">Loading Home Credit academic evidence…</p>
+        <article class="home-chapter is-visible" id="home-chapter-context" data-story-chapter tabindex="-1">
+          <div class="home-chapter-copy"><span class="chapter-number">01 · CONTEXT</span><h2>What is the model estimating?</h2><p>The Home Credit baseline estimates the probability of the source-provided <b>TARGET</b> for an application enriched with static historical aggregates. It is a classification experiment, not a new lending decision or a temporal forecast.</p><div class="story-checkpoint"><b>Interpretation</b><span>A probability ranks academic cases by estimated association with the target; it is not a certainty.</span></div></div>
+          <div class="home-chapter-stage"><div class="target-example"><span>Inputs</span><b>Application + aggregated history</b><span>→</span><span>Output</span><b>Academic probability for TARGET</b></div></div>
+        </article>
+
+        <article class="home-chapter" id="home-chapter-data" data-story-chapter tabindex="-1">
+          <div class="home-chapter-copy"><span class="chapter-number">02 · DATA BOUNDARY</span><h2>Which evidence is open to the model?</h2><p>We fit on train, select with train cross-validation, evaluate the selected candidates on validation, and keep the final test unopened. The split is entity-disjoint and static because the source archive has no defensible application timestamp.</p><div class="story-checkpoint"><b>What this protects</b><span>Selection decisions do not use the final test.</span></div></div>
+          <div class="home-chapter-stage"><div id="home-split-chart" class="chart chart-wide" role="img" aria-label="Home Credit train validation and test split chart"></div><div id="home-data-summary" class="story-data-summary"></div></div>
+        </article>
+
+        <article class="home-chapter" id="home-chapter-features" data-story-chapter tabindex="-1">
+          <div class="home-chapter-copy"><span class="chapter-number">03 · FEATURE CONSTRUCTION</span><h2>How does raw data become model input?</h2><p>The pipeline keeps the application table as the anchor and adds grouped aggregates from public historical tables. The groups describe the engineering path; they do not establish causality.</p><div class="story-checkpoint"><b>Feature contract</b><span>Audit-only columns remain outside model inputs.</span></div></div>
+          <div class="home-chapter-stage"><div id="home-feature-groups" class="feature-story-grid"></div><p id="home-audit-only" class="technical-note"></p><p class="technical-note">The groups are feature provenance, not a feature-importance claim.</p></div>
+        </article>
+
+        <article class="home-chapter" id="home-chapter-models" data-story-chapter tabindex="-1">
+          <div class="home-chapter-copy"><span class="chapter-number">04 · MODEL ITERATIONS</span><h2>How did the candidate improve?</h2><p>Each point is a controlled trial. The mean shows train cross-validation Average Precision; the whisker shows fold variation. The selected point is the best candidate under the declared primary metric.</p><div class="story-checkpoint"><b>Selection rule</b><span>Choose by train-CV Average Precision, then inspect validation once.</span></div></div>
+          <div class="home-chapter-stage"><div id="home-trial-chart" class="chart chart-wide" role="img" aria-label="Home Credit model trial comparison"></div><p id="home-iteration-result" class="lab-conclusion" aria-live="polite">Loading the iteration result…</p><div id="home-iteration-summary" class="model-cards"></div><div class="table-wrap"><table id="home-iteration-table"><thead><tr><th>Model</th><th>Iteration</th><th>Parameters</th><th>CV AP</th><th>Fold variation</th><th>Rank</th><th>Validation AP</th></tr></thead><tbody></tbody></table></div></div>
+        </article>
+
+        <article class="home-chapter" id="home-chapter-validation" data-story-chapter tabindex="-1">
+          <div class="home-chapter-copy"><span class="chapter-number">05 · VALIDATION</span><h2>Did the selected candidates hold outside cross-validation?</h2><p>Train-CV supports selection; validation is the separate check. Ranking metrics and probability-error metrics answer different questions, so they are shown with their own scales.</p><div class="story-checkpoint"><b>Read it carefully</b><span>A validation result is evidence for this static split, not a production guarantee.</span></div></div>
+          <div class="home-chapter-stage"><div id="home-validation-chart" class="chart chart-wide" role="img" aria-label="Home Credit validation metric comparison"></div><div id="home-calibration-chart" class="chart chart-wide" role="img" aria-label="Home Credit validation calibration chart"></div><p id="home-calibration-note" class="technical-note" aria-live="polite"></p></div>
+        </article>
+
+        <article class="home-chapter" id="home-chapter-policy" data-story-chapter tabindex="-1">
+          <div class="home-chapter-copy"><span class="chapter-number">06 · POLICY</span><h2>What changes when review capacity changes?</h2><p>Instead of pretending one threshold is universal, we rank validation cases and vary the fraction available for review. More capacity usually finds more target-positive cases while reducing precision.</p><div class="story-checkpoint"><b>Policy reading</b><span>Capacity is an operating assumption, not a model metric.</span></div></div>
+          <div class="home-chapter-stage"><div id="home-policy-chart" class="chart chart-wide" role="img" aria-label="Home Credit precision and recall by review capacity"></div><div id="home-policy-lift-chart" class="chart chart-wide" role="img" aria-label="Home Credit lift by review capacity"></div></div>
+        </article>
+
+        <article class="home-chapter" id="home-chapter-conclusion" data-story-chapter tabindex="-1">
+          <div class="home-chapter-copy"><span class="chapter-number">07 · CONCLUSION</span><h2>What can we conclude?</h2><p id="home-academic-conclusion" aria-live="polite">Loading the academic conclusion…</p><div class="story-checkpoint"><b>Boundary</b><span>Static benchmark only. No temporal stability, production validity, or real-credit claim.</span></div></div>
+          <div class="home-chapter-stage"><div id="home-iteration-contract" class="iteration-contract"></div></div>
+        </article>
+      </section>
+
+      <section class="panel" id="home-credit-panel">
+        <div class="section-heading"><div><div class="eyebrow">STATIC BENCHMARK · HOME CREDIT</div><h2>How does the selected pipeline perform?</h2></div><span class="pill" id="home-credit-status">Loading report…</span></div>
+        <p class="lead">This vertical uses the official Home Credit archive with entity-disjoint static splits. It demonstrates feature aggregation, model search and bounded review policy; it does not claim temporal stability or production credit performance. This is a <b>static benchmark</b>.</p>
+        <div id="home-credit-summary" class="model-cards"></div>
+        <div class="table-wrap"><table id="home-credit-table"><thead><tr><th>Model</th><th>Selected trial</th><th>Train-CV AP</th><th>Validation AP</th><th>Validation ROC-AUC</th><th>10% precision@capacity</th><th>10% recall@capacity</th></tr></thead><tbody></tbody></table></div>
+        <p id="home-credit-limitation" class="technical-note"></p>
+      </section>
+
+      <section class="panel" id="home-credit-policy-panel">
+        <div class="section-heading"><div><div class="eyebrow">HOME CREDIT · DECISION POLICY</div><h2>What if review capacity is limited?</h2></div></div>
+        <p class="lead">The Home Credit policy report ranks validation cases by estimated probability and measures what is found when only a fixed fraction can be reviewed.</p>
+        <div id="home-credit-policy-cards" class="model-cards"></div>
+        <p class="technical-note">Precision@capacity answers “how many reviewed cases were observed defaults?” Recall@capacity answers “how many observed defaults did the review budget find?” Lift compares precision with validation prevalence.</p>
+      </section>
+
+      </div>
+
+      <div id="tab-uci" class="dataset-tab-panel" role="tabpanel" aria-labelledby="tab-uci-button" hidden>
+
       <section class="panel" id="metrics-panel">
-        <div class="section-heading"><div><div class="eyebrow">EVIDENCE</div><h2>What question does each metric answer?</h2></div><span class="pill" id="run-id">Loading…</span></div>
+        <div class="section-heading"><div><div class="eyebrow">UCI REFERENCE BASELINE</div><h2>What question does each reference metric answer?</h2></div><span class="pill" id="run-id">Loading…</span></div>
         <p class="lead">These are not approval scores. They are different ways to describe model errors.</p>
         <div class="metric-cards">
           <article><h3>Recall <small>· coverage</small></h3><strong>How many does it find?</strong><p>Of the cases that actually defaulted, how many did the model detect?</p></article>
@@ -64,8 +132,8 @@
       </section>
 
       <section class="panel" id="model-lab-panel">
-        <div class="section-heading"><div><div class="eyebrow">MODEL DEVELOPMENT</div><h2>How was the model improved?</h2></div><button id="run-model-lab" class="button" type="button" hidden>Retry experiment</button></div>
-        <p class="lead">This experiment compares Logistic Regression and LightGBM. It tests parameters on training cross-validation, learns an alert threshold from out-of-fold predictions, and evaluates the selected candidates on validation. The final test remains closed.</p>
+        <div class="section-heading"><div><div class="eyebrow">UCI REFERENCE MODEL DEVELOPMENT</div><h2>How did the original reference baseline improve?</h2></div><button id="run-model-lab" class="button" type="button" hidden>Retry experiment</button></div>
+        <p class="lead">This preserved reference experiment compares Logistic Regression, LightGBM and KNN on the original UCI baseline. The primary Home Credit results are shown in the static benchmark panel below.</p>
         <p id="model-lab-status" class="lab-status" role="status">Preparing the cached academic experiment in the background…</p>
         <div id="model-lab-results" hidden>
           <div class="lab-flow" aria-label="Experiment flow"><article><b>1 · Search space</b><span>Define controlled parameter combinations.</span></article><article><b>2 · Cross-validation</b><span>Fit every trial across train folds.</span></article><article><b>3 · Select</b><span>Rank by Average Precision, then ROC-AUC.</span></article><article><b>4 · Validate</b><span>Evaluate the selected trial once on validation.</span></article></div>
@@ -80,7 +148,7 @@
       </section>
 
       <section class="panel" id="roc-panel">
-        <div class="section-heading"><div><div class="eyebrow">CHART 01 · COMPARISON</div><h2>Can it separate defaults from on-time payments?</h2></div></div>
+        <div class="section-heading"><div><div class="eyebrow">UCI REFERENCE · CHART 01</div><h2>Can the reference baseline separate defaults?</h2></div></div>
         <p class="lead">Each point is a different alert threshold. The curve closest to the top-left finds more defaults with fewer false alarms. The chart letters match the notes below.</p>
         <div id="roc-chart" class="chart chart-wide"></div>
         <div id="roc-annotations" class="annotation-legend"></div>
@@ -88,13 +156,20 @@
       </section>
 
       <section class="panel" id="probability-panel">
-        <div class="section-heading"><div><div class="eyebrow">CHART 02 · DISTRIBUTION</div><h2>How likely does it estimate that default to be?</h2></div></div>
+        <div class="section-heading"><div><div class="eyebrow">UCI REFERENCE · CHART 02</div><h2>How are reference probabilities distributed?</h2></div></div>
         <p class="lead">Each bar groups cases with a similar estimated probability. The tallest bar only shows where there are more cases; it does not mean those cases are the riskiest.</p>
-        <div class="chart-grid two-models"><article class="chart-card"><h3>Logistic Regression</h3><div id="probability-chart-logistic_regression" class="chart compact"></div></article><article class="chart-card"><h3>LightGBM</h3><div id="probability-chart-lightgbm" class="chart compact"></div></article></div>
+        <div class="chart-card"><h3>Logistic Regression vs LightGBM</h3><div id="probability-chart-comparison" class="chart chart-wide"></div><p class="technical-note">The bars overlap with transparency so you can compare where each model concentrates its estimated probabilities. Use the legend and hover details to distinguish the models.</p></div>
+      </section>
+
+      <section class="panel" id="calibration-panel">
+        <div class="section-heading"><div><div class="eyebrow">PROBABILITY QUALITY</div><h2>Do estimated probabilities match observed rates?</h2></div></div>
+        <p class="lead">A model can rank cases well and still give probabilities that are too high or too low. Each point groups validation cases by estimated probability and compares the estimate with the observed default rate.</p>
+        <div id="calibration-chart" class="chart chart-wide"></div>
+        <p class="technical-note">The diagonal represents <b>Perfect calibration</b>. Points above it mean defaults occurred more often than predicted; points below it mean the model predicted more risk than observed. This is validation evidence, not a production guarantee.</p>
       </section>
 
       <section class="panel threshold-panel" id="threshold-panel">
-        <div class="section-heading"><div><div class="eyebrow">INTERACTIVE LAB</div><h2>What do we gain by moving the alert?</h2></div><button id="play-sweep" class="button">▶ Play the story</button></div>
+        <div class="section-heading"><div><div class="eyebrow">UCI REFERENCE · INTERACTIVE LAB</div><h2>What did the reference threshold trade off?</h2></div><button id="play-sweep" class="button">▶ Play the story</button></div>
         <p class="lead">Lowering the threshold seeks more coverage. Raising it demands more evidence and usually improves precision. F1 helps show the balance.</p>
         <div class="stop-buttons"><button data-stop="low"><b>Capture more cases</b><span>Low threshold · more coverage</span></button><button data-stop="balanced"><b>Seek balance</b><span>Mid threshold · balance</span></button><button data-stop="high"><b>Be more selective</b><span>High threshold · more precision</span></button></div>
         <label class="control-label" for="threshold-slider">Threshold · alert line <output id="threshold-value">0.50</output></label>
@@ -105,20 +180,31 @@
         <div class="chart-grid two-models"><article class="chart-card"><h3>Logistic Regression</h3><div id="threshold-chart-logistic_regression" class="chart compact"></div></article><article class="chart-card"><h3>LightGBM</h3><div id="threshold-chart-lightgbm" class="chart compact"></div></article></div>
       </section>
 
+      <section class="panel" id="capacity-panel">
+        <div class="section-heading"><div><div class="eyebrow">DECISION POLICY</div><h2>What if review capacity is limited?</h2></div></div>
+        <p class="lead">Instead of choosing a probability threshold, rank cases from highest to lowest estimated risk and review only the available fraction. This makes the operational trade-off explicit.</p>
+        <label class="control-label" for="capacity-slider">Available review capacity <output id="capacity-value">10%</output></label>
+        <input id="capacity-slider" type="range" min="0.01" max="0.50" step="0.01" value="0.10" />
+        <p id="capacity-status" class="lab-status" role="status">Comparing validation ranking policies…</p>
+        <div id="capacity-summary" class="model-cards"></div>
+        <p class="technical-note">Precision@capacity answers “how many reviewed cases were observed defaults?” Recall@capacity answers “how many observed defaults did the review budget find?” Lift compares precision with the validation prevalence. This remains an academic validation policy.</p>
+      </section>
+
       <section class="panel prediction-panel">
-        <div class="section-heading"><div><div class="eyebrow">MODEL DEMO</div><h2>Enter an academic case</h2></div></div>
+        <div class="section-heading"><div><div class="eyebrow">UCI REFERENCE DEMO</div><h2>Explore the original UCI case flow</h2></div></div>
         <p class="lead">You do not need to invent 19 values. Choose a scenario to see the full flow, and open the details only if you want to experiment with each variable.</p>
         <div class="preset-grid"><button class="preset-button" data-preset="typical"><b>Typical profile</b><span>Moderate values to begin</span></button><button class="preset-button" data-preset="on-time"><b>On-time payments</b><span>Stable payment history</span></button><button class="preset-button" data-preset="late"><b>Recent delays</b><span>Higher academic risk signal</span></button></div>
         <div id="preset-status" class="preset-status">Choose a scenario or edit fields manually.</div>
-        <div class="real-case"><div><b>Or use a public anonymized case</b><span>Start from a validation record and change only the payment you want to test.</span></div><select id="example-select"></select><button id="load-example" class="button" type="button">Load case</button></div>
-        <div class="quick-edit"><div><label class="control-label" for="focus-feature">Change only one variable</label><select id="focus-feature"></select></div><div><label class="control-label" for="focus-value">New value</label><input id="focus-value" type="number" step="1000" value="2000" /></div><button id="apply-focus" class="button" type="button">Apply change</button></div>
-        <p class="form-hint standalone-hint">By default you edit <b>Payment made · September</b>. The model uses the active scenario for the remaining months; you do not need to edit each field.</p>
-        <form id="prediction-form"><details><summary>Edit the 19 academic variables</summary><p class="form-hint">You can change one field only. The remaining values stay from the selected scenario and are sent without requiring manual edits.</p><div id="feature-grid" class="feature-grid"></div></details><button class="button" type="submit">Calculate probability</button></form>
+        <div class="real-case"><div><b>Or use a public anonymized case</b><span>Start from a validation record and change one, several, or all variables.</span></div><select id="example-select"><option>Loading cases…</option></select><button id="load-example" class="button" type="button">Load case</button><p id="case-summary" class="case-summary" role="status">Loading public validation cases…</p></div>
+        <div class="quick-edit"><div><label class="control-label" for="focus-feature">Quick change a variable</label><select id="focus-feature"></select></div><div><label class="control-label" for="focus-value">New value</label><input id="focus-value" type="number" step="any" value="2000" /></div><button id="apply-focus" class="button" type="button">Apply change</button></div>
+        <p class="form-hint standalone-hint"><b>What-if scenario:</b> change one field for a simple demo, or edit as many fields as you need. Unchanged values are inherited from the selected case automatically.</p>
+        <form id="prediction-form"><details><summary>Edit the 19 academic variables</summary><p class="form-hint">Every field is optional. You can change one, several, or all 19 academic variables; the model predicts using the complete resulting scenario.</p><div id="feature-grid" class="feature-grid"></div></details><button class="button" type="submit">Calculate probability</button></form>
         <div id="prediction-result" class="prediction-result" hidden></div>
       </section>
+      </div>
     </main>
-    <footer>UCI Default of Credit Card Clients · local academic baseline · final test closed</footer>
-    <script src="/assets/app.js?v=model-lab-5"></script>
-    <script src="/assets/language.js?v=toggle-2"></script>
+    <footer>Home Credit Default Risk · static academic benchmark · UCI retained as reference · final tests closed</footer>
+    <script src="/assets/app.js?v=model-lab-27"></script>
+    <script src="/assets/language.js?v=toggle-5"></script>
   </body>
 </html>

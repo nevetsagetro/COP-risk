@@ -16,7 +16,9 @@ from sklearn.metrics import roc_curve  # type: ignore[import-untyped]
 from sklearn.pipeline import Pipeline  # type: ignore[import-untyped]
 
 from cop.evaluation.academic import run_academic_study
+from cop.evaluation.calibration import calibration_bins
 from cop.evaluation.model_lab import run_model_lab
+from cop.evaluation.policy import capacity_metrics
 from cop.features.uci import UCI_APPROVED_FEATURES
 from cop.training.config import BaselineConfig, load_baseline_config
 from cop.training.uci_baseline import (
@@ -235,6 +237,33 @@ class AcademicService:
             "note": "The tallest bar shows case concentration, not greater risk.",
         }
 
+    def calibration(self, bins: int = 10) -> dict[str, Any]:
+        """Return validation calibration bins without recalibrating models."""
+        predictions = self.artifacts.validation_predictions
+        target = predictions["target"].to_numpy(dtype=np.int64)
+        return {
+            "bins": bins,
+            "models": [
+                {
+                    "model": name,
+                    "points": calibration_bins(
+                        target,
+                        predictions[f"{name}_probability"].to_numpy(dtype=np.float64),
+                        bins=bins,
+                    ),
+                }
+                for name in MODEL_NAMES
+            ],
+            "reference": (
+                "Perfect calibration follows observed rate = predicted probability."
+            ),
+            "note": (
+                "Validation-only calibration evidence. Brier score summarizes the "
+                "same probability error; this chart shows where it occurs."
+            ),
+            "test_status": "unopened",
+        }
+
     def examples(self, limit: int = 6) -> dict[str, Any]:
         """Return public anonymized validation cases for interactive demos."""
         if not 1 <= limit <= 20:
@@ -311,6 +340,35 @@ class AcademicService:
         """Return the reproducible tuning report without opening the test."""
         return load_model_lab_results(str(self._config_path))
 
+    def capacity_policy(self, capacity: float = 0.10) -> dict[str, Any]:
+        """Compare top-capacity review policies on validation predictions."""
+        predictions = self.artifacts.validation_predictions
+        target = predictions["target"].to_numpy(dtype=np.int64)
+        models = [
+            {
+                "model": name,
+                **capacity_metrics(
+                    target,
+                    predictions[f"{name}_probability"].to_numpy(dtype=np.float64),
+                    capacity=capacity,
+                ),
+            }
+            for name in MODEL_NAMES
+        ]
+        return {
+            "capacity": capacity,
+            "models": models,
+            "selection": (
+                "Rank validation cases by predicted probability and review only "
+                "the highest-risk fraction."
+            ),
+            "note": (
+                "This is a validation policy comparison, not a production credit "
+                "decision or a model promotion."
+            ),
+            "test_status": "unopened",
+        }
+
     def predict(self, features: dict[str, float]) -> dict[str, Any]:
         expected = set(UCI_APPROVED_FEATURES)
         received = set(features)
@@ -349,10 +407,37 @@ class AcademicService:
         unknown = set(overrides) - set(UCI_APPROVED_FEATURES)
         if unknown:
             raise ValueError(f"Unknown override features: {sorted(unknown)}")
-        features = dict(case["features"])
-        features.update(overrides)
-        result = self.predict(features)
+        baseline_features = dict(case["features"])
+        scenario_features = dict(baseline_features)
+        scenario_features.update(overrides)
+        baseline = self.predict(baseline_features)
+        result = self.predict(scenario_features)
+        baseline_by_model = {
+            row["model"]: float(row["probability"]) for row in baseline["predictions"]
+        }
+        probability_changes = []
+        for row in result["predictions"]:
+            baseline_probability = baseline_by_model[row["model"]]
+            scenario_probability = float(row["probability"])
+            absolute_change = scenario_probability - baseline_probability
+            relative_change_pct = (
+                None
+                if baseline_probability == 0
+                else absolute_change / baseline_probability * 100
+            )
+            probability_changes.append(
+                {
+                    "model": row["model"],
+                    "baseline_probability": baseline_probability,
+                    "scenario_probability": scenario_probability,
+                    "absolute_change": absolute_change,
+                    "relative_change_pct": relative_change_pct,
+                }
+            )
         result["case_id"] = case_id
         result["observed_default_next_month"] = case["observed_default_next_month"]
         result["overrides"] = overrides
+        result["baseline_predictions"] = baseline["predictions"]
+        result["scenario_predictions"] = result["predictions"]
+        result["probability_changes"] = probability_changes
         return result

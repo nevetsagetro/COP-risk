@@ -1,0 +1,231 @@
+workflow_version: 1
+workflow_id: home-credit-model-improvement
+language: en
+project: COP Home Credit Model Improvement Roadmap
+objective: >-
+  Improve the Home Credit academic benchmark through reproducible feature
+  engineering, classical model benchmarking, optional deep learning,
+  robustness, explainability, and portfolio delivery.
+status: active
+waves:
+  - id: wave-01-baseline-audit
+    name: Baseline audit and cleanup
+    purpose: Establish reproducibility, leakage safety, and metric coherence before changing the model.
+    exit_criteria:
+      - Seed, dataset fingerprint, feature version, folds, and parameters are persisted.
+      - Split, preprocessing, aggregation, and evaluation leakage checks pass.
+      - Baseline metrics reconcile across reports and the API.
+      - A human-readable baseline protocol is documented.
+    tasks:
+      - id: HC33-001
+        title: Audit baseline artifacts and reproducibility metadata
+        agent: data_ml
+        depends_on: []
+        allowed_paths: [docs/plans/, docs/datasets/, runs/]
+        prohibited_paths: [data/, app/web/, src/cop/training/]
+        status: ready
+      - id: HC33-002
+        title: Implement seed and experiment metadata contract
+        agent: mlops
+        depends_on: [HC33-001]
+        allowed_paths: [src/cop/training/, src/cop/evaluation/, src/cop/serving/, scripts/, tests/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: proposed
+      - id: HC33-003
+        title: Perform read-only leakage and metric reconciliation review
+        agent: reviewer
+        depends_on: [HC33-001, HC33-002]
+        allowed_paths: [docs/plans/, docs/decisions/, src/, tests/]
+        prohibited_paths: [data/, runs/, .git/]
+        status: proposed
+      - id: HC33-004
+        title: Write the human-readable baseline protocol
+        agent: coordinator
+        depends_on: [HC33-003]
+        allowed_paths: [docs/plans/, docs/model-cards/, app/web/, tests/]
+        prohibited_paths: [data/, runs/, src/cop/training/]
+        status: proposed
+  - id: wave-02-feature-engineering-v2
+    name: Feature Engineering v2
+    purpose: Add leakage-safe feature families and measure their contribution through ablation.
+    exit_criteria:
+      - Feature versions preserve the current baseline.
+      - Every feature has source, availability, transformation, hypothesis, and leakage evidence.
+      - Feature-family ablations report AP, stability, calibration, and policy impact.
+    tasks:
+      - id: HC33-005
+        title: Create the feature catalog and hypotheses
+        agent: data_ml
+        depends_on: [HC33-004]
+        allowed_paths: [docs/datasets/, docs/plans/, src/cop/data/, tests/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: proposed
+      - id: HC33-006
+        title: Implement versioned financial and behavior features
+        agent: data_ml
+        depends_on: [HC33-005]
+        allowed_paths: [src/cop/data/, src/cop/features/, scripts/, tests/]
+        prohibited_paths: [data/, runs/, src/cop/api.py, app/web/]
+        status: proposed
+      - id: HC33-007
+        title: Run feature-family ablation experiments
+        agent: data_ml
+        depends_on: [HC33-006]
+        allowed_paths: [src/cop/evaluation/, src/cop/training/, scripts/, tests/, docs/model-cards/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: proposed
+      - id: HC33-008
+        title: Review feature leakage and contribution claims
+        agent: reviewer
+        depends_on: [HC33-007]
+        allowed_paths: [docs/, src/cop/data/, src/cop/evaluation/, tests/]
+        prohibited_paths: [data/, runs/, .git/]
+        status: proposed
+  - id: wave-03-model-benchmark-v2
+    name: Classical model benchmark v2
+    purpose: Compare stronger classical candidates and tune them without contaminating validation or test.
+    exit_criteria:
+      - Logistic Regression and LightGBM remain references.
+      - Optuna trials are reproducible and train-CV only.
+      - CatBoost and XGBoost are included only if dependency and license gates pass.
+      - Weighting and SMOTE-Tomek challengers are evaluated inside folds.
+    tasks:
+      - id: HC33-009
+        title: Define the classical benchmark matrix
+        agent: data_ml
+        depends_on: [HC33-008]
+        allowed_paths: [docs/plans/, configs/, src/cop/evaluation/, tests/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: proposed
+      - id: HC33-010
+        title: Implement Optuna search and trial artifacts
+        agent: mlops
+        depends_on: [HC33-009]
+        allowed_paths: [src/cop/evaluation/, src/cop/training/, scripts/, configs/, tests/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: proposed
+      - id: HC33-011
+        title: Evaluate CatBoost, XGBoost, weighting, and SMOTE-Tomek challengers
+        agent: data_ml
+        depends_on: [HC33-010]
+        allowed_paths: [src/cop/evaluation/, src/cop/training/, scripts/, tests/, docs/decisions/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: proposed
+      - id: HC33-012
+        title: Review benchmark selection and dependency boundaries
+        agent: reviewer
+        depends_on: [HC33-010, HC33-011]
+        allowed_paths: [docs/, src/, tests/]
+        prohibited_paths: [data/, runs/, .git/]
+        status: proposed
+  - id: wave-04-deep-learning
+    name: Deep learning benchmark
+    purpose: Test whether a controlled tabular neural baseline adds evidence beyond classical models.
+    exit_criteria:
+      - MLP scope, seed, preprocessing, and stopping rules are documented.
+      - Training and learning curves are reproducible.
+      - The MLP is compared with classical candidates on identical splits and metrics.
+      - FT-Transformer remains optional unless the MLP evidence justifies it.
+    tasks:
+      - id: HC33-013
+        title: Design the PyTorch MLP benchmark contract
+        agent: data_ml
+        depends_on: [HC33-012]
+        allowed_paths: [docs/plans/, docs/decisions/, src/cop/training/, tests/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: proposed
+      - id: HC33-014
+        title: Implement reproducible MLP training and evaluation
+        agent: data_ml
+        depends_on: [HC33-013]
+        allowed_paths: [src/cop/training/, src/cop/evaluation/, scripts/, tests/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: proposed
+      - id: HC33-015
+        title: Compare learning curves and model evidence
+        agent: coordinator
+        depends_on: [HC33-014]
+        allowed_paths: [src/cop/evaluation/, app/web/, tests/, docs/model-cards/]
+        prohibited_paths: [data/, runs/, src/cop/api.py]
+        status: proposed
+      - id: HC33-016
+        title: Review deep-learning claims and resource cost
+        agent: reviewer
+        depends_on: [HC33-014, HC33-015]
+        allowed_paths: [docs/, src/, tests/]
+        prohibited_paths: [data/, runs/, .git/]
+        status: proposed
+  - id: wave-05-robustness-explainability
+    name: Explainability and robustness
+    purpose: Test reliability, calibration, error patterns, and interpretation without unsupported claims.
+    exit_criteria:
+      - Calibration, bootstrap, seed stability, and error reports are available.
+      - Segment definitions exclude protected decision inputs and are documented.
+      - Explainability is presented as association, not causality.
+      - Robustness results can reject an apparently improved candidate.
+    tasks:
+      - id: HC33-017
+        title: Implement calibration and bootstrap evaluation
+        agent: data_ml
+        depends_on: [HC33-016]
+        allowed_paths: [src/cop/evaluation/, scripts/, tests/, docs/model-cards/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: proposed
+      - id: HC33-018
+        title: Implement explainability artifact contract
+        agent: monitoring
+        depends_on: [HC33-017]
+        allowed_paths: [src/cop/evaluation/, scripts/, tests/, docs/model-cards/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: proposed
+      - id: HC33-019
+        title: Analyze errors, seeds, and permitted evaluation segments
+        agent: monitoring
+        depends_on: [HC33-017, HC33-018]
+        allowed_paths: [src/cop/evaluation/, scripts/, tests/, docs/model-cards/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: proposed
+      - id: HC33-020
+        title: Review robustness and explainability boundaries
+        agent: reviewer
+        depends_on: [HC33-018, HC33-019]
+        allowed_paths: [docs/, src/, tests/]
+        prohibited_paths: [data/, runs/, .git/]
+        status: proposed
+  - id: wave-06-portfolio-delivery
+    name: Portfolio and final delivery
+    purpose: Present the full model-development process as a reproducible public demonstration.
+    exit_criteria:
+      - README and model card describe only verified capabilities.
+      - Frontend shows seeds, feature versions, iteration deltas, and human explanations.
+      - Final evaluation protocol is frozen before any permitted test opening.
+      - Read-only review and milestone finisher complete before commit authorization.
+    tasks:
+      - id: HC33-021
+        title: Write technical model card and experiment documentation
+        agent: coordinator
+        depends_on: [HC33-020]
+        allowed_paths: [README.md, docs/model-cards/, docs/plans/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: proposed
+      - id: HC33-022
+        title: Integrate reproducibility and iteration storytelling into the demo
+        agent: coordinator
+        depends_on: [HC33-020]
+        allowed_paths: [src/cop/api.py, src/cop/serving/, app/web/, tests/]
+        prohibited_paths: [data/, runs/, src/cop/training/]
+        status: proposed
+      - id: HC33-023
+        title: Perform final read-only portfolio and scientific review
+        agent: reviewer
+        depends_on: [HC33-021, HC33-022]
+        allowed_paths: [docs/, src/, app/, tests/]
+        prohibited_paths: [data/, runs/, .git/]
+        status: proposed
+      - id: HC33-024
+        title: Run milestone validation and prepare closure
+        agent: milestone_finisher
+        depends_on: [HC33-023]
+        allowed_paths: [docs/plans/, docs/workflows/, scripts/finish_milestone.py]
+        prohibited_paths: [data/, runs/, models/, .git/]
+        status: proposed

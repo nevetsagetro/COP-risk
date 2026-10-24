@@ -1,1 +1,1 @@
-"""Repository command-line entrypoints and their testable helpers."""
+"""Local repository automation scripts."""

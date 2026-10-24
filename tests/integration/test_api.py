@@ -4,6 +4,7 @@ import asyncio
 from typing import Any
 
 import httpx
+import pytest
 
 from cop.api import app
 from cop.features.uci import UCI_APPROVED_FEATURES
@@ -26,32 +27,76 @@ def test_health_and_static_frontend() -> None:
 
     frontend = request("GET", "/")
     assert frontend.status_code == 200
-    assert "COP · Credit-Risk Lab" in frontend.text
+    assert "COP · Home Credit Decision Lab" in frontend.text
     assert 'id="roc-chart"' in frontend.text
-    assert "Will a default be recorded next month?" in frontend.text
+    assert (
+        "Can the supplied application be associated with the source target?"
+        in frontend.text
+    )
     assert "Average precision (AP)" in frontend.text
     assert "Brier score" in frontend.text
+    assert 'id="probability-chart-comparison"' in frontend.text
+    assert "Logistic Regression vs LightGBM" in frontend.text
     assert 'data-preset="late"' in frontend.text
     assert "Edit the 19 academic variables" in frontend.text
-    assert "You can change one field only" in frontend.text
-    assert "Change only one variable" in frontend.text
+    assert "Every field is optional" in frontend.text
+    assert "What-if scenario" in frontend.text
+    assert "Quick change a variable" in frontend.text
+    assert 'id="focus-value" type="number" step="any"' in frontend.text
     assert "Or use a public anonymized case" in frontend.text
+    assert 'id="case-summary"' in frontend.text
+    assert "case-summary" in frontend.text
+    assert "Loading cases" in frontend.text
     assert "Play the story" in frontend.text
+    assert 'id="capacity-panel"' in frontend.text
+    assert "Precision@capacity" in frontend.text
+    assert 'id="calibration-panel"' in frontend.text
+    assert "Perfect calibration" in frontend.text
     assert 'id="language-toggle"' in frontend.text
     assert 'id="model-lab-panel"' in frontend.text
+    assert 'id="home-credit-panel"' in frontend.text
+    assert 'id="home-academic-story"' in frontend.text
+    assert 'id="home-academic-status"' in frontend.text
+    assert 'id="home-trial-chart"' in frontend.text
+    assert 'id="home-iteration-table"' in frontend.text
+    assert 'id="home-data-summary"' in frontend.text
+    assert 'id="home-audit-only"' in frontend.text
+    assert 'id="home-policy-chart"' in frontend.text
+    assert 'id="home-validation-chart"' in frontend.text
+    assert 'id="home-calibration-chart"' in frontend.text
+    assert 'id="home-policy-lift-chart"' in frontend.text
+    assert "What can we conclude?" in frontend.text
+    assert 'aria-live="polite"' in frontend.text
+    assert "data-story-chapter" in frontend.text
+    assert 'id="tab-home-button"' in frontend.text
+    assert 'id="tab-uci-button"' in frontend.text
+    assert 'id="tab-home"' in frontend.text
+    assert 'id="tab-uci"' in frontend.text
+    assert "static benchmark" in frontend.text
+    assert "Home Credit Default Risk" in frontend.text
     assert 'id="run-model-lab"' in frontend.text
     assert "Which trial performed best?" in frontend.text
     assert 'id="journey-panel"' in frontend.text
     assert "From dataset to final model decision" in frontend.text
-    assert "/assets/language.js?v=toggle-2" in frontend.text
+    assert "/assets/app.js?v=model-lab-27" in frontend.text
+    assert 'id="home-iteration-result"' in frontend.text
+    assert "/assets/language.js?v=toggle-5" in frontend.text
     app_script = request("GET", "/assets/app.js?v=model-lab-5")
     assert app_script.status_code == 200
     assert "Plotly.newPlot" in app_script.text
-    language_script = request("GET", "/assets/language.js?v=toggle-2")
+    language_script = request("GET", "/assets/language.js?v=toggle-3")
     assert language_script.status_code == 200
     assert "language-toggle" in language_script.text
     assert 'let language = stored === "es" ? "es" : "en";' in language_script.text
-    assert "Change saved" in app_script.text
+    styles = request("GET", "/assets/styles.css?v=home-academic-1")
+    assert styles.status_code == 200
+    assert "prefers-reduced-motion" in styles.text
+    assert ".home-chapter.is-visible" in styles.text
+    assert "You can apply more changes before calculating" in app_script.text
+    assert "renderCaseSummary" in app_script.text
+    assert "await setupExamples()" in app_script.text
+    assert "Academic evidence unavailable" in app_script.text
+    assert "Academic evidence loaded" in app_script.text
     plotly_asset = request("GET", "/assets/plotly.min.js?v=english-1")
     assert plotly_asset.status_code == 200
     assert len(plotly_asset.content) > 1_000_000
@@ -86,6 +131,15 @@ def test_read_only_analytical_endpoints_keep_test_closed() -> None:
     assert probabilities.status_code == 200
     assert len(probabilities.json()["distributions"]) == 2
 
+    calibration = request("GET", "/api/calibration")
+    assert calibration.status_code == 200
+    assert calibration.json()["test_status"] == "unopened"
+    assert {row["model"] for row in calibration.json()["models"]} == {
+        "logistic_regression",
+        "lightgbm",
+    }
+    assert all(row["points"] for row in calibration.json()["models"])
+
     examples = request("GET", "/api/examples")
     assert examples.status_code == 200
     assert examples.json()["cases"]
@@ -103,6 +157,50 @@ def test_read_only_analytical_endpoints_keep_test_closed() -> None:
     assert lab.status_code == 200
     assert lab.json()["test_status"] == "unopened"
     assert set(lab.json()["models"]) == {"logistic_regression", "lightgbm", "knn"}
+
+    home_credit = request("GET", "/api/home-credit")
+    assert home_credit.status_code == 200
+    assert home_credit.json()["authorized_use"] == "academic_static_benchmark_only"
+    assert home_credit.json()["test_status"] == "unopened"
+    assert {row["model"] for row in home_credit.json()["models"]} == {
+        "logistic_regression",
+        "lightgbm",
+    }
+
+    home_credit_academic = request("GET", "/api/home-credit/academic")
+    assert home_credit_academic.status_code == 200
+    academic = home_credit_academic.json()
+    assert academic["test_status"] == "unopened"
+    assert academic["evidence_boundary"]["fit_split"] == "train"
+    assert academic["evidence_boundary"]["evaluation_split"] == "validation"
+    assert academic["feature_groups"]
+    assert academic["iterations"]
+    assert all(
+        row["iteration_comparison"]["selected_trial"] == row["selected_trial"]
+        for row in academic["models"]
+    )
+    assert all(
+        "average_precision_delta" in row["iteration_comparison"]
+        for row in academic["models"]
+    )
+    for row in academic["models"]:
+        comparison = row["iteration_comparison"]
+        assert comparison["average_precision_delta"] == pytest.approx(
+            comparison["selected_average_precision"]
+            - comparison["baseline_average_precision"]
+        )
+    assert academic["calibration"]["status"] == "available"
+    assert all(row["points"] for row in academic["calibration"]["models"])
+    assert set(academic["policy"]["capacities"]) == {0.01, 0.05, 0.1, 0.2}
+
+    policy = request("GET", "/api/policy-capacity", params={"capacity": 0.1})
+    assert policy.status_code == 200
+    assert policy.json()["test_status"] == "unopened"
+    assert {row["model"] for row in policy.json()["models"]} == {
+        "logistic_regression",
+        "lightgbm",
+    }
+    assert all(0 <= row["recall_at_capacity"] <= 1 for row in policy.json()["models"])
 
 
 def test_prediction_endpoint_uses_the_frozen_feature_contract() -> None:
@@ -137,3 +235,21 @@ def test_prediction_endpoint_applies_only_case_overrides() -> None:
     assert response.status_code == 200
     assert response.json()["case_id"] == case_id
     assert response.json()["overrides"] == {"PAY_AMT1": 0.0}
+    payload = response.json()
+    assert {row["model"] for row in payload["baseline_predictions"]} == {
+        "logistic_regression",
+        "lightgbm",
+    }
+    assert {row["model"] for row in payload["probability_changes"]} == {
+        "logistic_regression",
+        "lightgbm",
+    }
+    assert all(
+        row["scenario_probability"]
+        == next(
+            prediction["probability"]
+            for prediction in payload["predictions"]
+            if prediction["model"] == row["model"]
+        )
+        for row in payload["probability_changes"]
+    )
