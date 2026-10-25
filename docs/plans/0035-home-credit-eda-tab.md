@@ -10,8 +10,8 @@
 - Source of truth: `AGENTS.md`, `PLANS.md`, and the Home Credit academic plans.
 
 Implementation checkpoint: the EDA report, read-only endpoint, and independent
-frontend tab are implemented and remain `complete_pending_review` in the
-workflow. Independent review and milestone closure are still pending.
+frontend tab are implemented. The read-only review is complete_pending_finisher;
+the milestone finisher remains pending.
 
 ## Objective
 
@@ -118,6 +118,12 @@ Exit criteria:
 - A read-only reviewer confirms no scientific or dataset-boundary regression.
 - The milestone finisher validates only the allowlist.
 
+Observed validation note: the focused unit/API suite passes (`94 passed`), but
+the full suite currently does not finish within the local timeout while running
+`tests/integration/test_model_lab_integration.py::test_model_lab_tunes_both_families_without_opening_test`.
+This is pre-existing model-lab execution scope and is not exercised by the
+cached EDA tab.
+
 ## Out of scope
 
 - Feature selection, hyperparameter tuning, or model retraining from EDA.
@@ -139,3 +145,31 @@ python3 -m ruff check .
 python3 -m mypy src tests
 git diff --check
 ```
+
+## Version-control allowlist
+
+Tracked files or directories allowed:
+
+- README.md
+- docs/plans/0035-home-credit-eda-tab.md
+- docs/workflows/0035-home-credit-eda-tab.yaml
+- docs/reviews/0035-home-credit-eda-review.md
+- scripts/run_home_credit_eda.py
+- src/cop/evaluation/
+- src/cop/api.py
+- src/cop/serving/home_credit.py
+- app/web/
+- tests/integration/test_api.py
+- tests/unit/test_home_credit_eda.py
+
+Generated artifacts forbidden:
+
+- data/
+- runs/
+- models/
+- .venv/
+- .git/
+
+Expected commit message:
+
+- feat(eda): close ExecPlan 0035 Home Credit EDA

@@ -36,7 +36,7 @@ waves:
         depends_on: [HC35-001, HC35-002]
         allowed_paths: [docs/]
         prohibited_paths: [data/, runs/, app/web/, .git/]
-        status: proposed
+        status: complete_pending_review
   - id: wave-02-offline-eda
     name: Offline EDA materialization
     purpose: Generate deterministic, cached descriptive evidence from Home Credit.
@@ -65,7 +65,7 @@ waves:
         depends_on: [HC35-004, HC35-005]
         allowed_paths: [docs/, src/cop/evaluation/, tests/]
         prohibited_paths: [data/, runs/, app/web/, .git/]
-        status: proposed
+        status: complete_pending_review
   - id: wave-03-eda-api
     name: Read-only EDA API
     purpose: Serve cached EDA evidence without changing existing contracts.
@@ -94,7 +94,7 @@ waves:
         depends_on: [HC35-007, HC35-008]
         allowed_paths: [docs/, src/cop/serving/, tests/]
         prohibited_paths: [data/, runs/, app/web/, .git/]
-        status: proposed
+        status: complete_pending_review
   - id: wave-04-independent-frontend
     name: Independent EDA tab and visual interpretation
     purpose: Present cached data-audit evidence without interfering with scrollytelling.
@@ -124,7 +124,7 @@ waves:
         depends_on: [HC35-010, HC35-011]
         allowed_paths: [app/web/, tests/, docs/]
         prohibited_paths: [data/, runs/, .git/]
-        status: proposed
+        status: complete_pending_review
   - id: wave-05-closure
     name: Regression validation and milestone closure
     purpose: Close the EDA tab without changing the existing model-development story.
@@ -139,14 +139,14 @@ waves:
         depends_on: [HC35-012]
         allowed_paths: [tests/, docs/plans/, docs/workflows/]
         prohibited_paths: [data/, runs/, .git/]
-        status: proposed
+        status: complete_pending_review
       - id: HC35-014
         title: Perform final read-only review
         agent: reviewer
         depends_on: [HC35-013]
         allowed_paths: [docs/, src/, app/, tests/]
         prohibited_paths: [data/, runs/, .git/]
-        status: proposed
+        status: complete_pending_review
       - id: HC35-015
         title: Validate the allowlist and prepare milestone closure
         agent: milestone_finisher
