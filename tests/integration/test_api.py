@@ -87,7 +87,7 @@ def test_health_and_static_frontend() -> None:
     assert "Which trial performed best?" in frontend.text
     assert 'id="journey-panel"' in frontend.text
     assert "From dataset to final model decision" in frontend.text
-    assert "/assets/app.js?v=model-lab-37" in frontend.text
+    assert "/assets/app.js?v=model-lab-38" in frontend.text
     assert 'href="#tab-uci-button"' not in frontend.text
     assert "3 · UCI reference" not in frontend.text
     assert 'id="tab-home" class="dataset-tab-panel"' in frontend.text
