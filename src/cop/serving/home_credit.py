@@ -289,6 +289,7 @@ class HomeCreditService:
             "models": model_evidence,
             "iterations": iterations,
             "classical_benchmark": self._classical_benchmark(),
+            "deep_learning": self._deep_learning_benchmark(),
             "policy": {
                 "capacities": policy["capacities"],
                 "models": policy["models"],
@@ -397,6 +398,49 @@ class HomeCreditService:
                 "act as fixed classical challengers. The highest validation score "
                 "is evidence for this split, not an automatic promotion."
             ),
+        }
+
+    def _deep_learning_benchmark(self) -> dict[str, Any]:
+        """Expose the cached neural benchmark without importing or training it."""
+        report_paths: list[Path] = []
+        for run_directory in (
+            self._run_directory,
+            self._comparison_run_directory,
+        ):
+            if run_directory is not None:
+                report_paths.append(
+                    run_directory.parent
+                    / "deep-learning"
+                    / "deep-learning-results.json"
+                )
+        report_path = next((path for path in report_paths if path.exists()), None)
+        if report_path is None:
+            return {
+                "status": "unavailable",
+                "reason": "The deep-learning benchmark has not been materialized.",
+            }
+        report = _json(report_path)
+        return {
+            "status": report.get("status", "available"),
+            "test_status": report.get("test_status", "unopened"),
+            "feature_version": report.get("feature_version"),
+            "experiment_seed": report.get("experiment_seed"),
+            "fit_split": report.get("fit_split"),
+            "early_stopping_split": report.get("early_stopping_split"),
+            "evaluation_split": report.get("evaluation_split"),
+            "raw_feature_count": report.get("raw_feature_count"),
+            "encoded_feature_count": report.get("encoded_feature_count"),
+            "architecture": report.get("architecture"),
+            "parameter_count": report.get("parameter_count"),
+            "hyperparameters": report.get("hyperparameters", {}),
+            "best_epoch": report.get("best_epoch"),
+            "best_internal_average_precision": report.get(
+                "best_internal_average_precision"
+            ),
+            "learning_curve": report.get("learning_curve", []),
+            "validation": report.get("validation"),
+            "classical_comparison": report.get("classical_comparison", {}),
+            "human_explanation": report.get("human_explanation"),
         }
 
     def _feature_comparison(self) -> dict[str, Any]:
