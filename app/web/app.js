@@ -88,7 +88,7 @@ function renderModelLab(data) {
     marker: {size: chartRows.map(({candidate}) => candidate.selected ? 13 : 9), color: chartRows.map(({name, candidate}) => candidate.selected ? "#2563eb" : name === "knn" ? "#94a3b8" : "#b9c9e8")},
     customdata: chartRows.map(({candidate}) => [parameterText(candidate.parameters), candidate.cross_validation_std.average_precision, candidate.rank]),
     hovertemplate: "%{y}<br>CV AP: %{x:.2%} ± %{customdata[1]:.2%}<br>Rank: %{customdata[2]}<br>%{customdata[0]}<extra></extra>"
-  }], {height: Math.max(300, chartRows.length * 34), margin:{l:20,r:90,t:18,b:55}, xaxis:{title:"Average Precision · train CV",tickformat:".1%",range:[Math.max(0, minimumAp - spread * 0.35), Math.min(1, bestAp + spread * 0.35)]}, yaxis:{autorange:"reversed",automargin:true}, showlegend:false}, plotConfig);
+  }], {height: Math.max(330, chartRows.length * 34), margin:{l:210,r:145,t:18,b:55}, xaxis:{title:"Average Precision · train CV",tickformat:".1%",range:[Math.max(0, minimumAp - spread * 0.35), Math.min(1, bestAp + spread * 0.35)]}, yaxis:{autorange:"reversed",automargin:false}, showlegend:false}, plotConfig);
   requestAnimationFrame(() => {
     ["#model-lab-chart"].forEach(selector => {
       const chart = document.querySelector(selector);

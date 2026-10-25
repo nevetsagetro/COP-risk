@@ -122,6 +122,8 @@ th small { color:var(--blue); font-size:.68rem; text-transform:none; letter-spac
 .lab-conclusion { margin:18px 0; padding:14px 16px; border:1px solid #cbdcff; border-radius:12px; background:#f8fbff; color:var(--ink); }
 .lab-subheading { margin-top:24px; }
 #model-lab-chart { width:100%; }
+.model-lab-chart-shell { width:100%; min-height:330px; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#fbfcfe; }
+.model-lab-chart-shell > .plotly-graph-div { width:100% !important; min-width:0; }
 #model-lab-table td:nth-child(3) { white-space:normal; min-width:220px; }
 #model-lab-table td:nth-child(5) { color:var(--muted); }
 #home-credit-table td:nth-child(2) { white-space:normal; min-width:150px; }
