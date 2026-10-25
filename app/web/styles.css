@@ -122,13 +122,14 @@ th small { color:var(--blue); font-size:.68rem; text-transform:none; letter-spac
 #model-lab-table td:nth-child(3) { white-space:normal; min-width:220px; }
 #model-lab-table td:nth-child(5) { color:var(--muted); }
 #home-credit-table td:nth-child(2) { white-space:normal; min-width:150px; }
-.chart { min-height:390px; }
+.chart { min-height:390px; width:100%; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
 .chart-grid { display:grid; gap:14px; }
 .chart-grid.two-models { grid-template-columns:1fr; }
 .chart-card { min-width:0; border:1px solid var(--line); border-radius:14px; background:#fbfcfe; padding:12px 12px 0; }
 .chart-card h3 { padding:4px 8px 0; }
 .chart-card p { color:var(--muted); padding:0 8px; font-size:.84rem; }
 .chart.compact { min-height:330px; }
+.chart .plot-container, .chart .svg-container { border-radius:11px; }
 .chart-wide { width:100%; }
 .note-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; border-top:1px solid var(--line); padding-top:16px; }
 .note-row div { display:flex; flex-direction:column; gap:3px; }
