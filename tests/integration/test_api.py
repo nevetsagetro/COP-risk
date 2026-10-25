@@ -56,6 +56,9 @@ def test_health_and_static_frontend() -> None:
     assert 'id="model-lab-panel"' in frontend.text
     assert 'id="home-credit-panel"' in frontend.text
     assert 'id="home-academic-story"' in frontend.text
+    assert 'id="home-eda-button"' in frontend.text
+    assert 'id="home-eda-view"' in frontend.text
+    assert 'id="home-eda-correlation-chart"' in frontend.text
     assert 'id="home-academic-status"' in frontend.text
     assert 'id="home-trial-chart"' in frontend.text
     assert 'id="home-iteration-table"' in frontend.text
@@ -88,8 +91,8 @@ def test_health_and_static_frontend() -> None:
     assert "Which trial performed best?" in frontend.text
     assert 'id="journey-panel"' in frontend.text
     assert "From dataset to final model decision" in frontend.text
-    assert "/assets/app.js?v=model-lab-72" in frontend.text
-    assert 'href="/assets/styles.css?v=home-layout-70"' in frontend.text
+    assert "/assets/app.js?v=model-lab-75" in frontend.text
+    assert 'href="/assets/styles.css?v=home-layout-71"' in frontend.text
     assert 'class="model-contract-flow"' in frontend.text
     assert "TARGET probability" in frontend.text
     assert 'id="roc-chart" class="chart uci-chart chart-wide"' in frontend.text
@@ -113,6 +116,8 @@ def test_health_and_static_frontend() -> None:
         in app_script.text
     )
     assert "function resizeUciCharts()" in app_script.text
+    assert "function loadHomeEda()" in app_script.text
+    assert 'api("/api/home-credit/eda")' in app_script.text
     assert (
         'chapters.forEach(chapter=>chapter.classList.add("is-visible"))'
         in app_script.text
@@ -124,6 +129,11 @@ def test_health_and_static_frontend() -> None:
     assert 'xanchor:"center"' in app_script.text
     assert "chartRows.length * 38 + 100" in app_script.text
     assert "xshift: 12" in app_script.text
+    assert 'type:"scatter",mode:"markers+text"' in app_script.text
+    assert "Validation Average Precision · zoomed comparison" in app_script.text
+    assert "Zoomed scale · exact values shown" in app_script.text
+    assert "benchmark-meta" in app_script.text
+    assert "benchmark-results" in app_script.text
     language_script = request("GET", "/assets/language.js?v=toggle-3")
     assert language_script.status_code == 200
     assert "language-toggle" in language_script.text
@@ -235,6 +245,14 @@ def test_read_only_analytical_endpoints_keep_test_closed() -> None:
         )
     assert academic["feature_groups"]
     assert academic["iterations"]
+    home_credit_eda = request("GET", "/api/home-credit/eda")
+    assert home_credit_eda.status_code == 200
+    eda = home_credit_eda.json()
+    assert eda["test_status"] == "unopened"
+    assert eda["population"]["final_test_used"] is False
+    assert eda["population"]["analysis_split"] == "train"
+    assert eda["correlations"]["method"] == "Pearson correlation"
+    assert eda["missingness"]["features"]
     if academic["classical_benchmark"]["status"] == "available":
         assert academic["classical_benchmark"]["test_status"] == "unopened"
         assert academic["classical_benchmark"]["selection_split"] == (

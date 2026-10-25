@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>COP · Credit Risk Model Labs</title>
-    <link rel="stylesheet" href="/assets/styles.css?v=home-layout-70" />
+    <link rel="stylesheet" href="/assets/styles.css?v=home-layout-71" />
     <script src="/assets/plotly.min.js?v=english-1"></script>
   </head>
   <body>
@@ -26,6 +26,8 @@
       </nav>
 
       <div id="tab-home" class="dataset-tab-panel" role="tabpanel" aria-labelledby="tab-home-button">
+      <nav class="home-view-tabs" aria-label="Home Credit views" role="tablist"><button class="home-view-tab is-active" id="home-story-button" type="button" role="tab" aria-selected="true" aria-controls="home-story-view">Decision story</button><button class="home-view-tab" id="home-eda-button" type="button" role="tab" aria-selected="false" aria-controls="home-eda-view">Data audit / EDA</button></nav>
+      <div id="home-story-view" role="tabpanel" aria-labelledby="home-story-button">
       <section class="story-grid" aria-label="Idea principal">
         <article class="story-card"><span>01</span><h2>Inspect</h2><p>We verify the Home Credit snapshot, entity split and feature contract.</p></article>
         <article class="story-card"><span>02</span><h2>Compare</h2><p>We search Logistic Regression and LightGBM candidates with train cross-validation.</p></article>
@@ -120,6 +122,21 @@
       </section>
 
       </div>
+      <div id="home-eda-view" role="tabpanel" aria-labelledby="home-eda-button" hidden>
+        <section class="panel eda-intro-panel" id="home-eda-panel">
+          <div class="section-heading"><div><div class="eyebrow">HOME CREDIT · DATA AUDIT</div><h2>What does the dataset look like?</h2></div><span class="pill" id="home-eda-status">Loading cached EDA…</span></div>
+          <p class="lead">This optional audit summarizes the cached Home Credit snapshot before model development. It is descriptive evidence, not feature importance, causal analysis, or a live computation.</p>
+          <div id="home-eda-summary" class="eda-summary"></div>
+          <p id="home-eda-limitation" class="technical-note"></p>
+        </section>
+        <section class="eda-grid" aria-label="Home Credit exploratory data analysis">
+          <article class="panel eda-card eda-card-wide"><div class="section-heading"><div><div class="eyebrow">01 · TARGET</div><h3>Observed target prevalence</h3></div></div><div id="home-eda-prevalence-chart" class="home-chart chart-wide" role="img" aria-label="Home Credit target prevalence chart"></div><p class="technical-note">Snapshot prevalence comes from the manifest; the validation summary is reported separately. The final test is not used for feature analysis.</p></article>
+          <article class="panel eda-card"><div class="section-heading"><div><div class="eyebrow">02 · COMPLETENESS</div><h3>Missingness in model inputs</h3></div></div><div id="home-eda-missingness-chart" class="home-chart chart-wide" role="img" aria-label="Home Credit feature missingness chart"></div><p class="technical-note">Shows the twelve highest missingness rates in the train split.</p></article>
+          <article class="panel eda-card"><div class="section-heading"><div><div class="eyebrow">03 · DISTRIBUTIONS</div><h3>Selected variables by target</h3></div></div><div id="home-eda-distribution-chart" class="home-chart chart-wide" role="img" aria-label="Home Credit selected feature distributions by target chart"></div><p class="technical-note">Points show medians; whiskers show the 5th–95th percentile range in train.</p></article>
+          <article class="panel eda-card eda-card-wide"><div class="section-heading"><div><div class="eyebrow">04 · ASSOCIATION</div><h3>Correlation structure</h3></div><span class="pill">Pearson · train only</span></div><div id="home-eda-correlation-chart" class="home-chart chart-wide" role="img" aria-label="Home Credit feature correlation matrix"></div><p class="technical-note">This matrix describes linear association among a fixed numeric model-input subset. It is not feature importance, causality, or leakage proof.</p></article>
+        </section>
+        <section class="panel eda-contract"><div class="section-heading"><div><div class="eyebrow">05 · CONTRACT</div><h3>Audit boundaries</h3></div></div><div id="home-eda-contract" class="eda-contract-grid"></div></section>
+      </div>
 
       <div id="tab-uci" class="dataset-tab-panel" role="tabpanel" aria-labelledby="tab-uci-button" hidden>
 
@@ -208,7 +225,7 @@
       </div>
     </main>
     <footer>COP · two independent public academic benchmarks · final tests closed</footer>
-    <script src="/assets/app.js?v=model-lab-72"></script>
+    <script src="/assets/app.js?v=model-lab-75"></script>
     <script src="/assets/language.js?v=toggle-5"></script>
   </body>
 </html>
