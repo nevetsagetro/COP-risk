@@ -87,7 +87,7 @@ def test_health_and_static_frontend() -> None:
     assert "Which trial performed best?" in frontend.text
     assert 'id="journey-panel"' in frontend.text
     assert "From dataset to final model decision" in frontend.text
-    assert "/assets/app.js?v=model-lab-38" in frontend.text
+    assert "/assets/app.js?v=model-lab-39" in frontend.text
     assert 'href="#tab-uci-button"' not in frontend.text
     assert "3 · UCI reference" not in frontend.text
     assert 'id="tab-home" class="dataset-tab-panel"' in frontend.text
@@ -97,6 +97,7 @@ def test_health_and_static_frontend() -> None:
     app_script = request("GET", "/assets/app.js?v=model-lab-5")
     assert app_script.status_code == 200
     assert "Plotly.newPlot" in app_script.text
+    assert "function resizeCharts(scope)" in app_script.text
     language_script = request("GET", "/assets/language.js?v=toggle-3")
     assert language_script.status_code == 200
     assert "language-toggle" in language_script.text

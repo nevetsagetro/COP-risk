@@ -36,6 +36,12 @@ Plotly.newPlot = (target, data, layout, config) => originalNewPlot(target, data,
 Plotly.react = (target, data, layout, config) => originalReact(target, data, themedLayout(layout), config);
 const MODEL_LAB_SESSION_KEY = "cop-model-lab-session-v1";
 const api = async (path, options={}) => { const response = await fetch(path, options); if (!response.ok) throw new Error(await response.text()); return response.json(); };
+function resizeCharts(scope) {
+  const resize = () => document.querySelectorAll(`${scope} .js-plotly-plot`).forEach(chart => Plotly.Plots.resize(chart));
+  requestAnimationFrame(resize);
+  requestAnimationFrame(() => requestAnimationFrame(resize));
+  window.setTimeout(resize, 120);
+}
 
 function renderMetrics(data) {
   const body = document.querySelector("#metrics-table tbody");
@@ -174,7 +180,7 @@ async function loadUciReference() {
     renderMetrics(metrics); renderRoc(roc); renderProbabilities(probabilities); renderCalibration(calibration);
     setupThreshold(); setupCapacity(); setupModelLab(); buildForm();
     uciLoaded = true;
-    requestAnimationFrame(() => document.querySelectorAll(".dataset-tab-panel:not([hidden]) .js-plotly-plot").forEach(chart => Plotly.Plots.resize(chart)));
+    resizeCharts("#tab-uci");
   } catch(error) {
     document.querySelector("#tab-uci").innerHTML=`<div class="panel"><h2>Could not load the UCI reference</h2><p>${error.message}</p></div>`;
   }
@@ -186,7 +192,7 @@ function setupDatasetTabs() {
     tabs.forEach(item => { const active = item === button; item.classList.toggle("is-active", active); item.setAttribute("aria-selected", String(active)); });
     document.querySelectorAll(".dataset-tab-panel").forEach(panel => { panel.hidden = panel.id !== target; });
     if (target === "tab-uci") loadUciReference();
-    requestAnimationFrame(() => document.querySelectorAll(`#${target} .js-plotly-plot`).forEach(chart => Plotly.Plots.resize(chart)));
+    resizeCharts(`#${target}`);
   }));
 }
 function readModelLabSession() {
