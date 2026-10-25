@@ -45,6 +45,11 @@ artifacts/**
 !artifacts/**/.gitkeep
 !artifacts/**/README.md
 
+# Runs, predicciones e informes locales
+predictions/**
+runs/**
+reports/local/**
+
 # MLflow local
 mlruns/
 .mlruns/

@@ -1,0 +1,95 @@
+training_contract_version: 1
+dataset_id: uci-default-credit-card
+authorized_use: academic_baseline_only
+snapshot:
+  directory: data/processed/uci-default-credit-card/uci-default-credit-card-academic-b5e140d1bc9a620a12b1b2c3b86f79f5b71a140ac5063927f2d951d8800b6a9a
+  snapshot_id: uci-default-credit-card-academic-b5e140d1bc9a620a12b1b2c3b86f79f5b71a140ac5063927f2d951d8800b6a9a
+  logical_sha256: 4e8a12bfa1fd3e73281c9966126b0ec053ef1a3a4edcf1999c8340f816c318d0
+splits:
+  directory: data/processed/uci-default-credit-card/splits/academic-splits-uci-default-credit-card-academic-b5e140d1bc9a620a12b1b2c3b86f79f5b71a140ac5063927f2d951d8800b6a9a
+  manifest_sha256: 6b30f04dd7c5162c4d58ba58d5548046311b9b8ab8c5f6a6be3c9e76bfa36c07
+  logical_sha256: d1e3ff1bbf3063a146e2d57f4a59c533cf89fa58f57f02cae45dd14e1202fade
+  development_files:
+    train:
+      path: train.parquet
+      rows: 21000
+      class_counts: {"0": 16355, "1": 4645}
+      physical_sha256: a4d59b0441b909e7888c0e1d25b8eb90e8e302334180193becd8ad2fbf1de24c
+      logical_sha256: e40f11301ddee0fa9ec5510fa48ad1947118e9d2a030130f45596fb7abd61c1a
+    validation:
+      path: validation.parquet
+      rows: 4500
+      class_counts: {"0": 3505, "1": 995}
+      physical_sha256: 98fac19b8696d44fa828e06b61e999961cd9ad0da99e3db006bbe72efa96e449
+      logical_sha256: 2cbfe313e6c4264fde7d04ae0f6475bd8657dba27d2d3704de1570648626cc66
+target: default_payment_next_month
+features:
+  approved:
+    - LIMIT_BAL
+    - PAY_0
+    - PAY_2
+    - PAY_3
+    - PAY_4
+    - PAY_5
+    - PAY_6
+    - BILL_AMT1
+    - BILL_AMT2
+    - BILL_AMT3
+    - BILL_AMT4
+    - BILL_AMT5
+    - BILL_AMT6
+    - PAY_AMT1
+    - PAY_AMT2
+    - PAY_AMT3
+    - PAY_AMT4
+    - PAY_AMT5
+    - PAY_AMT6
+  categorical:
+    - PAY_0
+    - PAY_2
+    - PAY_3
+    - PAY_4
+    - PAY_5
+    - PAY_6
+  numeric:
+    - LIMIT_BAL
+    - BILL_AMT1
+    - BILL_AMT2
+    - BILL_AMT3
+    - BILL_AMT4
+    - BILL_AMT5
+    - BILL_AMT6
+    - PAY_AMT1
+    - PAY_AMT2
+    - PAY_AMT3
+    - PAY_AMT4
+    - PAY_AMT5
+    - PAY_AMT6
+missing_policy: fail
+threshold: 0.5
+random_seed: 42
+models:
+  logistic_regression:
+    C: 1.0
+    class_weight: null
+    fit_intercept: true
+    l1_ratio: 0.0
+    max_iter: 1000
+    solver: liblinear
+  lightgbm:
+    class_weight: null
+    colsample_bytree: 1.0
+    deterministic: true
+    force_col_wise: true
+    learning_rate: 0.05
+    max_depth: -1
+    min_child_samples: 20
+    n_estimators: 200
+    n_jobs: 1
+    num_leaves: 31
+    objective: binary
+    reg_alpha: 0.0
+    reg_lambda: 0.0
+    subsample: 1.0
+    verbosity: -1
+run_root: runs/uci-baseline

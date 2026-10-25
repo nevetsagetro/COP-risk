@@ -1,0 +1,76 @@
+workflow_version: 1
+workflow_id: home-credit-deep-learning
+language: en
+project: COP Home Credit Deep Learning Phase
+objective: >-
+  Add a reproducible offline PyTorch MLP challenger and expose its cached
+  evidence through the read-only academic story.
+status: complete
+waves:
+  - id: wave-01-mlp-benchmark
+    name: MLP benchmark
+    purpose: Train and evaluate a neural challenger without opening the final test.
+    exit_criteria:
+      - Preprocessing is fit on train only.
+      - Early stopping uses a train-only holdout.
+      - Curves, seed, architecture, parameter count and validation metrics are materialized.
+      - The report preserves test_status unopened.
+    tasks:
+      - id: HC34-001
+        title: Implement reproducible offline MLP training
+        agent: data_ml
+        depends_on: []
+        allowed_paths: [src/cop/training/, scripts/, tests/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: complete
+      - id: HC34-002
+        title: Run and inspect cached MLP evidence
+        agent: mlops
+        depends_on: [HC34-001]
+        allowed_paths: [docs/plans/, tests/]
+        prohibited_paths: [data/, runs/, .git/]
+        status: complete
+  - id: wave-02-story-serving
+    name: Read-only serving and storytelling
+    purpose: Explain neural evidence without running training in the application.
+    exit_criteria:
+      - API reads only materialized JSON/CSV artifacts.
+      - Page shows architecture, early stopping, curve, comparison and limits.
+      - Missing artifacts produce an explicit unavailable state.
+    tasks:
+      - id: HC34-003
+        title: Expose cached MLP evidence in the Home Credit service
+        agent: mlops
+        depends_on: [HC34-002]
+        allowed_paths: [src/cop/serving/, tests/]
+        prohibited_paths: [data/, runs/, src/cop/training/]
+        status: complete
+      - id: HC34-004
+        title: Add human-readable neural scrollytelling
+        agent: coordinator
+        depends_on: [HC34-003]
+        allowed_paths: [app/web/, tests/]
+        prohibited_paths: [data/, runs/, src/cop/training/]
+        status: complete
+  - id: wave-03-closure
+    name: Scientific review and closure
+    purpose: Validate the phase and create a separate version tag.
+    exit_criteria:
+      - Full validation and diff review pass.
+      - Technical decisions and limitations are documented.
+      - A separate commit/tag is created without changing v0.3.0.
+    tasks:
+      - id: HC34-005
+        title: Perform read-only technical review
+        agent: reviewer
+        depends_on: [HC34-004]
+        allowed_paths: [docs/, src/, app/, tests/]
+        prohibited_paths: [data/, runs/, .git/]
+        status: complete
+      - id: HC34-006
+        title: Run milestone validation and prepare closure
+        agent: milestone_finisher
+        depends_on: [HC34-005]
+        allowed_paths: [docs/plans/, docs/workflows/, scripts/finish_milestone.py]
+        prohibited_paths: [data/, runs/, models/, .git/]
+        status: complete

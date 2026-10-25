@@ -47,11 +47,9 @@ deployment, or integration exists unless verified in the working tree.
 - Drift may request or start challenger training, but promotion and rollback
   require explicit human action, comparison with the champion, and an
   auditable record.
-- Deterministic synthetic data is the principal initial source for developing
-  and demonstrating the first complete vertical. The generator, configuration,
-  seeds, and snapshots are versioned; primary output is Parquet; manifests
-  contain physical and logical hashes; `snapshot_as_of` is part of snapshot
-  identity.
+- ADR 0006 initially selected deterministic synthetic data for bootstrap; ADR
+  0009 supersedes that priority and makes UCI the principal vertical. Synthetic
+  code remains isolated and must not be a dependency of the UCI pipeline.
 - Synthetic targets are derived from a generated schedule/ledger. Immature,
   absent, and censored labels remain unknown.
 - Splits respect time and `borrower_id`; the final test remains outside
@@ -85,7 +83,7 @@ Do not silently decide or implement:
 - final target definition and exact DPD threshold;
 - horizon, population, estimand, snapshot size, borrower/application counts,
   prevalence, temporal windows, distributions, and correlations;
-- model features;
+- production model features; the 19 UCI academic-baseline features are frozen;
 - final model metrics and quantitative gates;
 - exact drift scenarios, metrics, windows, and thresholds.
 
@@ -96,8 +94,12 @@ Record accepted decisions as ADRs under `docs/decisions/`.
 The accepted roadmap technologies and policies remain unimplemented until
 verified in the working tree. In particular, the repository does not yet
 implement Prefect, MLflow persistence, SQLite state, a local artifact store,
-`uv.lock`, functional Docker Compose services, training, monitoring,
+`uv.lock`, functional Docker Compose services, production training, monitoring,
 challenger/champion transitions, promotion, rollback, or cloud infrastructure.
+
+The repository does implement one local academic UCI training baseline with
+fixed Logistic Regression and LightGBM configurations. It is not a production
+pipeline, tracked MLflow experiment, champion, or authorization for serving.
 
 ## Safety and compliance
 
@@ -143,3 +145,14 @@ At the end of every task, report:
 For multi-component features, architecture changes, or work expected to span
 multiple sessions, create and maintain an ExecPlan under `docs/plans/`
 following `PLANS.md`.
+
+## Milestone closure
+
+Every technical milestone ends with a read-only reviewer and then the
+`milestone_finisher`. The finisher reads the active ExecPlan allowlist, runs
+fixed validations, and may prepare staging only through
+`scripts/finish_milestone.py`. Automated closure never uses `git add .`.
+
+A commit always requires explicit human authorization in the current turn and
+an explicit message matching the ExecPlan. The finisher never pushes, deletes,
+cleans, resets, amends, rebases, restores, or force-updates repository state.

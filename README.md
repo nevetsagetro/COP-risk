@@ -1,209 +1,214 @@
-# COP — demostración de riesgo de crédito
+# COP · Credit Risk Model Labs
 
-COP es un proyecto de portfolio y demostración cuyo objetivo es explorar un
-ciclo controlado de scoring de riesgo de crédito: preparación de datos,
-entrenamiento reproducible, evaluación, serving, observabilidad de drift y
-retraining con promoción separada.
+COP is a local-first portfolio project for demonstrating a reproducible credit-risk machine-learning workflow: data contracts, controlled splits, feature engineering, model comparison, threshold policies, model serving, and human-readable analysis.
 
-> **Advertencia:** COP no está aprobado para tomar decisiones crediticias
-> reales. No debe utilizar datos reales de clientes ni información personal
-> identificable (PII), y sus resultados no deben emplearse para conceder,
-> denegar o modificar crédito.
+> **Scope:** COP is an academic and portfolio demonstration. It is not approved for real credit decisions. Use only public anonymized or synthetic data. Do not use its outputs to approve, deny, or modify credit.
 
-## Estado actual verificable
+## Current status
 
-El repositorio contiene un baseline de ingeniería y dos verticales de datos
-claramente separadas:
+The repository currently contains two separate academic data verticals:
 
-- documentación del proyecto y reglas para mantener ExecPlans;
-- un paquete Python mínimo bajo `src/cop`;
-- configuración de packaging y herramientas de desarrollo en
-  `pyproject.toml`;
-- una plantilla segura de variables de entorno;
-- exclusiones de Git para secretos y artefactos locales;
-- perfiles de agentes de desarrollo;
-- un smoke test que comprueba que `cop` puede importarse;
-- una decisión aceptada y configuración metodológica congelada para el
-  snapshot sintético v1 de demostración local;
-- un generador sintético por CLI con configuración YAML, Parquet, manifest,
-  hashes físicos/lógicos y validación contractual;
-- cinco splits temporales reproducibles y disjuntos por `borrower_id`, con
-  purga y manifest verificable.
-- un evaluador machine-readable de datasets por capacidad y un snapshot de UCI
-  Default of Credit Card Clients aceptado solo para baseline académico local,
-  con splits estratificados reproducibles.
+| Vertical | Purpose | Current interface |
+| --- | --- | --- |
+| **Home Credit** | Model-development evidence: feature construction, trials, validation, policy analysis, and the cached MLP challenger | FastAPI + static Plotly frontend |
+| **UCI Default of Credit Card Clients** | Reproducible baseline with Logistic Regression and LightGBM, threshold analysis, and anonymized what-if cases | FastAPI + static Plotly frontend; Streamlit fallback |
 
-UCI Default of Credit Card Clients es la vertical principal. El código UCI no
-depende del paquete sintético. La generación sintética se conserva como una
-vertical metodológica aislada y no define la ruta principal del proyecto.
+The frontend keeps both projects separate. It reads local cached artifacts and does not train models, tune parameters, or open the final test while the application is running.
 
-Existen un snapshot sintético v1 aprobado exclusivamente para entrenamiento
-local de demostración; sus filas permanecen fuera de Git y su identidad se
-registra en `docs/datasets/synthetic-v1-acceptance.md`; y un snapshot UCI
-aceptado únicamente para baseline académico, documentado en
-`docs/datasets/uci-default-credit-card.md`. No hay EDA, pipeline de
-features, modelo, entrenamiento, experimento, API, imagen Docker
-funcional, servicio, orquestador, informe de drift, dashboard, retraining, base
-de datos o infraestructura cloud implementados. El ZIP local de SFLLD fue
-rechazado y no contradice este estado. Los directorios vacíos con nombres de
-componentes reservan estructura, pero no demuestran capacidades.
+Implemented and verified in the repository:
 
-## Visión y capacidades planificadas
+- Python package and local API under `src/cop`;
+- public anonymized UCI baseline with train/validation development and a closed final test;
+- Home Credit cached academic artifacts for feature engineering, ablation, cross-validation, tuning, classical challengers, policy analysis, and the MLP milestone;
+- FastAPI endpoints and an English-first static HTML/Plotly frontend with an optional `EN / ES` toggle;
+- reproducible CLI jobs, tests, linting, and type checking;
+- synthetic data generation and split utilities kept isolated from the UCI pipeline.
 
-La visión futura contempla una demostración local que pueda:
+Not production-ready or approved by this repository:
 
-1. usar únicamente datos sintéticos o públicos anonimizados y con procedencia
-   documentada;
-2. preparar splits reproducibles sin target leakage ni temporal leakage;
-3. entrenar y evaluar challengers sin contaminar un test intacto;
-4. registrar evidencia reproducible de experimentos;
-5. servir solo un modelo promovido mediante un proceso auditable;
-6. observar drift sin convertirlo en promoción automática;
-7. permitir retraining controlado con comparación challenger/champion y
-   rollback.
+- no production champion, promotion, rollback, or lending authorization;
+- no live retraining from the browser;
+- no MLflow persistence, Prefect orchestration, Evidently monitoring, Grafana dashboard, or cloud deployment as an operational system;
+- no fairness or real-world performance claim.
 
-Esta lista expresa trabajo planificado. Ninguna de estas capacidades existe
-todavía en el repositorio.
+## Quick start
 
-## Decisiones técnicas aceptadas
-
-`AGENTS.md` es la fuente normativa de las decisiones de producto aceptadas:
-
-- Python como lenguaje de implementación;
-- SMOTE-Tomek para balanceo cuando esté justificado;
-- LightGBM como familia principal de modelos;
-- Optuna para optimización de hiperparámetros;
-- MLflow para seguimiento de experimentos;
-- FastAPI y Docker para serving;
-- Evidently para monitorización de drift;
-- Grafana para visualización operacional.
-
-El baseline de desarrollo soporta Python 3.12 y usa `python3` como comando
-canónico. Las tecnologías enumeradas arriba están aceptadas para trabajo
-futuro, pero no se han añadido como dependencias ni se han implementado.
-
-Los ADR aceptados añaden estas decisiones; su implementación debe comprobarse
-por separado en el árbol:
-
-- Prefect será el orquestador cuando exista un pipeline Python manual,
-  reproducible, probado e idempotente;
-- COP será local-first y Docker Compose se añadirá incrementalmente para
-  servicios concretos; cloud sigue fuera de alcance;
-- MLflow usará inicialmente SQLite para metadata y filesystem local para
-  artefactos, sin decidir feature store;
-- `uv.lock` será la estrategia de lock y se generará en un milestone posterior;
-- drift puede solicitar o iniciar challengers, pero promoción y rollback serán
-  humanos, comparativos y auditados;
-- ADR 0006 estableció inicialmente los datos sintéticos como fuente principal;
-  ADR 0009 sustituye esa prioridad y establece UCI como vertical principal. La
-  implementación sintética existente se conserva aislada y no es dependencia
-  del pipeline UCI.
-
-La primera versión del generador sintético y los splits v1 están implementados
-y validados por CLI. ADR 0007 acepta sus parámetros exclusivamente para la
-demostración sintética local. Esto no implementa el pipeline ML ni aporta
-evidencia sobre crédito real.
-
-## Decisiones todavía pendientes
-
-Continúan sin decidir fuera del perfil sintético local de ADR 0007:
-
-- parámetros metodológicos para cualquier dataset real futuro;
-- distribuciones, correlaciones y escenarios exactos de drift posteriores;
-- el proveedor cloud, que permanece fuera de alcance;
-- el feature store y el almacenamiento de features;
-- las features concretas;
-- los umbrales de drift;
-- las métricas finales, gates cuantitativos y autoridad/mecanismo de
-  aprobación;
-- la configuración completa de Docker Compose;
-- los detalles operativos de Prefect, MLflow, backup, retención y migración.
-
-Una decisión aceptada debe registrarse mediante un ADR bajo
-`docs/decisions/`. La aceptación documental no demuestra implementación.
-
-## Desarrollo mínimo
-
-Requisitos:
-
-- Python 3.12;
-- Git;
-- acceso a un índice de paquetes compatible con `pip` para instalar las
-  herramientas de desarrollo fijadas en `pyproject.toml`.
-
-Preparación:
+Requirements: Python 3.12, Git, and the development dependencies declared in `pyproject.toml`.
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python3 -m pip install -e '.[dev]'
+python3 -m pip install -e '.[dev,api]'
+python3 -m uvicorn cop.api:app --reload --port 8000
 ```
 
-Validación:
+Open `http://127.0.0.1:8000`.
+
+The API is read-only with respect to model development: it serves local reports and model artifacts. Opening the application never retrains a model or runs tuning.
+
+Useful endpoints:
+
+```text
+/health
+/api/overview
+/api/metrics
+/api/roc
+/api/probabilities
+/api/calibration
+/api/examples
+/api/threshold-sweep?model=lightgbm
+/api/model-lab
+/api/home-credit
+/api/home-credit/academic
+/api/predict
+```
+
+## Product structure
+
+The frontend presents the two datasets as independent labs.
+
+### Home Credit Decision Lab
+
+This is the model-development story. It explains:
+
+1. what the source `TARGET` represents;
+2. which train, validation, and test evidence is open;
+3. how application data becomes aggregated features;
+4. how Logistic Regression, LightGBM, CatBoost, XGBoost, and the MLP challenger are compared;
+5. how cross-validation and validation are interpreted;
+6. how review capacity changes precision, recall, and lift;
+7. why the result remains an academic static benchmark.
+
+Home Credit results are materialized offline under `runs/`. The browser only presents those cached JSON/CSV artifacts.
+
+### UCI Reference Baseline
+
+This is the original academic baseline. It uses the 19 frozen UCI variables and compares Logistic Regression with LightGBM. The final test remains closed unless explicitly finalized through the documented CLI.
+
+The UCI simulator supports public anonymized validation cases using the convention `UCI-VAL-####`. A user can change one, several, or all variables without being forced to edit unrelated fields.
+
+## Reproducible model development
+
+### UCI baseline
 
 ```bash
-python3 -c "import cop"
+python3 scripts/train_uci_baseline.py
+python3 scripts/run_mvp_demo.py
+```
+
+The development flow fits on train, evaluates selected candidates on validation, and keeps the final test outside selection. To explicitly finalize the test, use the separate command below only when that action is intended:
+
+```bash
+python3 scripts/train_uci_baseline.py --finalize-test
+```
+
+The finalization is explicit and cannot be reopened or overwritten. UCI results are descriptive academic benchmark results; they do not select a production champion.
+
+### Home Credit model-improvement milestone
+
+Home Credit experiments are executed offline and cached:
+
+- feature engineering and feature-family ablation;
+- reproducible train cross-validation;
+- classical model trials;
+- Optuna-based parameter search where the cached experiment supports it;
+- validation comparison;
+- review-capacity policy analysis;
+- cached MLP challenger evidence as a separate intermediate milestone.
+
+Reproduction requires the recorded dataset fingerprint, feature version, split seed, experiment seed, and model parameters. The final test remains closed during development.
+
+### Academic model lab
+
+```bash
+python3 scripts/run_academic_model_lab.py
+```
+
+The lab compares Logistic Regression, LightGBM, and KNN candidates using cross-validation over train. KNN is included as an academic benchmark with scaled numeric variables; its presence does not imply that it is the selected model. Candidates are compared by the declared metric and then checked on validation.
+
+## Data and methodological contract
+
+- Only public anonymized or synthetic data is allowed.
+- Splits are reproducible and must prevent target leakage and temporal leakage.
+- Resampling and preprocessing are fit inside training folds only.
+- The final test remains outside feature selection, hyperparameter search, calibration, early stopping, and threshold selection.
+- Protected or audit-only attributes are physically separated and never used as model inputs.
+- Metrics are reported with their split and role: train-CV supports selection; validation checks the selected candidate; test is reserved for explicit final evaluation.
+- Synthetic results do not support claims about real credit performance, calibration, fairness, or usefulness.
+
+## Optional Streamlit fallback
+
+```bash
+python3 -m pip install -e '.[demo]'
+python3 -m streamlit run app/streamlit_app.py
+```
+
+Streamlit is retained as a fallback presentation for the UCI baseline. The FastAPI/static frontend is the primary experience because it keeps the Home Credit and UCI labs separated and presents cached model evidence without live computation.
+
+## Validation
+
+Run the focused checks before submitting a change:
+
+```bash
 python3 -m ruff format --check .
 python3 -m ruff check .
 python3 -m mypy src tests
 python3 -m pytest
 git diff --check
-git status --short
 ```
 
-La configuración de entorno de ejemplo se copia solo cuando una funcionalidad
-la necesite:
+The integration tests verify the API contract, static frontend, dataset separation, cached academic evidence, and regression-sensitive chart structure.
 
-```bash
-cp .env.example .env
-```
+## Synthetic demonstration vertical
 
-`.env` es local y está ignorado por Git. Los valores actuales de
-`.env.example` son ficticios y ninguna funcionalidad del paquete los consume
-todavía.
-
-## Generador sintético mínimo
-
-Tras instalar las dependencias, la configuración v1 se ejecuta con:
+The synthetic generator is isolated from the UCI and Home Credit model paths. It is useful for demonstrating data contracts and reproducible splits, not for making claims about real credit.
 
 ```bash
 python3 scripts/generate_synthetic_snapshot.py \
   --config configs/data/synthetic-v1-approved.yaml
-```
 
-La salida queda bajo `data/raw/synthetic/`, ignorada por Git. La CLI rechaza
-sobrescrituras; `--force` debe indicarse expresamente. Un snapshot existente se
-verifica sin escribir con:
-
-```bash
 python3 scripts/generate_synthetic_snapshot.py \
   --verify data/raw/synthetic/<snapshot_id>
-```
 
-Los splits aprobados se crean después de verificar el snapshot:
-
-```bash
 python3 scripts/create_synthetic_splits.py \
   --snapshot data/raw/synthetic/<snapshot_id>
 ```
 
-Esta capacidad genera datos y splits de demostración; no crea un pipeline ML
-ni evidencia sobre crédito real.
+Generated data remains outside Git. The accepted methodology is documented in `docs/synthetic-data-specification.md` and the corresponding dataset decision files.
 
-## Evaluación académica UCI
+## Documentation map
 
-La adquisición y evaluación reproducibles se ejecutan con:
+- `AGENTS.md` — repository rules and accepted technical decisions;
+- `docs/plans/` — execution plans and milestone scope;
+- `docs/decisions/` — accepted architectural decisions;
+- `docs/datasets/uci-default-credit-card.md` — UCI provenance and limitations;
+- `docs/datasets/home-credit-candidate.md` — Home Credit dataset contract;
+- `docs/model-card-uci-baseline.md` — UCI academic model card;
+- `docs/evaluation-protocol.md` — split and evaluation rules;
+- `docs/workflows/` — wave and task definitions for planned work.
+
+## Roadmap
+
+The first portfolio milestone is the classical Home Credit model-development story plus the cached frontend presentation. Deep learning is deliberately a separate follow-up sprint even though the current UI can present the cached MLP challenger evidence.
+
+Future work remains explicitly planned rather than implied as production capability:
+
+1. complete the classical benchmark and documentation gates;
+2. deepen explainability, calibration, error and segment analysis;
+3. run the dedicated deep-learning benchmark;
+4. add controlled monitoring and artifact tracking;
+5. define human approval, promotion, rollback, and operational deployment contracts.
+
+Prefect, MLflow, Evidently, Grafana, Docker Compose topology, cloud deployment, feature storage, promotion authority, and backup procedures remain subject to their accepted ADRs and later implementation milestones.
+
+## Milestone closure
+
+Each technical milestone has an ExecPlan with a version-control allowlist. The finisher validates only that allowlist and never authorizes commits, pushes, resets, deletion, or rebases automatically.
 
 ```bash
-python3 scripts/download_uci_credit_card.py
-python3 scripts/evaluate_dataset_candidate.py \
-  --acquisition data/raw/uci-default-credit-card/<acquisition_id>
+python3 scripts/finish_milestone.py \
+  --plan docs/plans/<plan>.md --check
+
+python3 scripts/finish_milestone.py \
+  --plan docs/plans/<plan>.md --stage
 ```
-
-La aceptación UCI es estática y académica. Sus fallos de temporalidad,
-monitoring longitudinal y producción permanecen explícitos.
-
-## Planificación
-
-El roadmap general está en `docs/plans/0001-bootstrap.md`. Cada milestone
-ejecutable debe mantenerse como un ExecPlan pequeño conforme a `PLANS.md`.
