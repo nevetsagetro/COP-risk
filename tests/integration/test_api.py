@@ -71,6 +71,7 @@ def test_health_and_static_frontend() -> None:
     assert "academic-process" in frontend.text
     assert 'id="home-audit-only"' in frontend.text
     assert 'id="home-policy-chart"' in frontend.text
+    assert 'id="home-policy-chart" class="home-chart chart-wide"' in frontend.text
     assert 'id="home-validation-chart"' in frontend.text
     assert 'id="home-calibration-chart"' in frontend.text
     assert 'id="home-policy-lift-chart"' in frontend.text
@@ -87,7 +88,10 @@ def test_health_and_static_frontend() -> None:
     assert "Which trial performed best?" in frontend.text
     assert 'id="journey-panel"' in frontend.text
     assert "From dataset to final model decision" in frontend.text
-    assert "/assets/app.js?v=model-lab-50" in frontend.text
+    assert "/assets/app.js?v=model-lab-72" in frontend.text
+    assert 'href="/assets/styles.css?v=home-layout-70"' in frontend.text
+    assert 'class="model-contract-flow"' in frontend.text
+    assert "TARGET probability" in frontend.text
     assert 'id="roc-chart" class="chart uci-chart chart-wide"' in frontend.text
     assert 'id="model-lab-chart" class="model-lab-chart-shell"' in frontend.text
     assert 'href="#tab-uci-button"' not in frontend.text
@@ -95,11 +99,26 @@ def test_health_and_static_frontend() -> None:
     assert 'id="tab-home" class="dataset-tab-panel"' in frontend.text
     assert 'id="tab-uci" class="dataset-tab-panel"' in frontend.text
     assert 'id="home-iteration-result"' in frontend.text
+    assert 'class="lab-conclusion iteration-results"' in frontend.text
     assert "/assets/language.js?v=toggle-5" in frontend.text
     app_script = request("GET", "/assets/app.js?v=model-lab-5")
     assert app_script.status_code == 200
     assert "Plotly.newPlot" in app_script.text
     assert "function resizeCharts(scope)" in app_script.text
+    assert "readableTestStatus" in app_script.text
+    assert 'resizeCharts("#tab-home")' not in app_script.text
+    assert "resizeCharts(`#${entry.target.id}`)" not in app_script.text
+    assert (
+        'if (target === "tab-uci") { loadUciReference(); resizeCharts("#tab-uci"); }'
+        in app_script.text
+    )
+    assert "function resizeUciCharts()" in app_script.text
+    assert (
+        'chapters.forEach(chapter=>chapter.classList.add("is-visible"))'
+        in app_script.text
+    )
+    assert "testUnopened" in app_script.text
+    assert "iteration-result-line" in app_script.text
     assert "function persistDataset(target)" in app_script.text
     assert 'searchParams.set("dataset"' in app_script.text
     assert 'xanchor:"center"' in app_script.text
@@ -113,6 +132,10 @@ def test_health_and_static_frontend() -> None:
     assert styles.status_code == 200
     assert "prefers-reduced-motion" in styles.text
     assert ".home-chapter.is-visible" in styles.text
+    assert ".model-lab-chart-shell {" in styles.text
+    assert ".home-chart {" in styles.text
+    assert ".chart {" in styles.text
+    assert "overflow:hidden;" in styles.text
     assert "#home-iteration-table { table-layout:fixed" in styles.text
     assert "You can apply more changes before calculating" in app_script.text
     assert "renderCaseSummary" in app_script.text

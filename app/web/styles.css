@@ -22,6 +22,14 @@ p { margin:0; }
 .target-card p { max-width:860px; color:var(--muted); }
 .target-example { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin-top:18px; padding-top:14px; border-top:1px solid #cbdcff; color:var(--blue); }
 .target-example span { color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; font-weight:800; }
+.model-contract-flow { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr); align-items:stretch; gap:10px; margin-top:4px; }
+.model-contract-step { display:flex; flex-direction:column; justify-content:center; gap:6px; min-width:0; padding:16px 14px; border:1px solid var(--line); border-radius:12px; background:#fbfcfe; }
+.model-contract-step > span { color:var(--blue); font-size:.7rem; font-weight:900; letter-spacing:.07em; }
+.model-contract-step strong { font-size:1rem; line-height:1.2; }
+.model-contract-step small { color:var(--muted); line-height:1.4; }
+.model-contract-output { border-color:#b8cfff; background:#f3f7ff; }
+.model-contract-arrow { align-self:center; color:var(--blue); font-size:1.3rem; font-weight:800; }
+.model-contract-note { margin:12px 0 0; color:var(--muted); font-size:.86rem; line-height:1.5; }
 .annotation-legend { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:0 0 18px; }
 .annotation-legend article { border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:#fbfcfe; }
 .annotation-legend b { color:var(--blue); margin-right:6px; }
@@ -120,8 +128,10 @@ th small { color:var(--blue); font-size:.68rem; text-transform:none; letter-spac
 .lab-flow b { color:var(--blue); font-size:.86rem; }
 .lab-flow span { color:var(--muted); font-size:.82rem; margin-top:4px; }
 .lab-conclusion { margin:18px 0; padding:14px 16px; border:1px solid #cbdcff; border-radius:12px; background:#f8fbff; color:var(--ink); }
+.iteration-results { display:grid; gap:10px; }
+.iteration-result-line { display:block; line-height:1.5; }
 .lab-subheading { margin-top:24px; }
-.model-lab-chart-shell { width:100%; min-height:520px; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#fbfcfe; }
+.model-lab-chart-shell { position:relative; isolation:isolate; width:100%; min-height:520px; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#fbfcfe; }
 .model-lab-chart-shell > .plotly-graph-div { width:100% !important; min-width:0; }
 #model-lab-table td:nth-child(2) small { display:block; color:var(--muted); font-family:var(--mono); font-size:.72rem; margin-top:3px; }
 #model-lab-table td:nth-child(3) { white-space:normal; min-width:220px; }
@@ -137,7 +147,9 @@ th small { color:var(--blue); font-size:.68rem; text-transform:none; letter-spac
 #home-iteration-table th:nth-child(5) { width:15%; }
 #home-iteration-table th:nth-child(6) { width:8%; }
 #home-iteration-table th:nth-child(7) { width:13%; }
-.chart { display:flex; justify-content:center; align-items:center; min-height:390px; width:100%; margin:14px auto; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#fbfcfe; }
+.home-chart { position:relative; isolation:isolate; display:flex; justify-content:center; align-items:center; min-height:390px; width:100%; margin:14px auto; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#fbfcfe; }
+.home-chart > .plotly-graph-div { flex:1 1 auto; align-self:center; width:100% !important; min-width:0; margin-inline:auto; }
+.chart { position:relative; isolation:isolate; display:flex; justify-content:center; align-items:center; min-height:390px; width:100%; margin:14px auto; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#fbfcfe; }
 .chart > .plotly-graph-div { flex:1 1 auto; align-self:center; width:100% !important; min-width:0; margin-inline:auto; }
 .uci-chart { display:block; }
 .uci-chart > .plotly-graph-div { width:100% !important; margin:0; }
@@ -207,5 +219,6 @@ output { float:right; color:var(--blue); }
 .prediction-comparison .change-down { color:#087443; }
 .prediction-comparison .change-flat { color:var(--muted); }
 footer { padding:26px 28px 50px; color:var(--muted); font-size:.85rem; }
+@media (max-width:900px) { .model-contract-flow { grid-template-columns:1fr; gap:8px; } .model-contract-arrow { justify-self:center; transform:rotate(90deg); } }
 @media (max-width:760px) { .story-grid, .metric-cards, .note-row, .feature-grid, .prediction-result, .chart-grid.two-models, .model-cards, .preset-grid, .annotation-legend, .quick-edit, .real-case, .lab-flow, .journey-grid { grid-template-columns:1fr; } .panel { padding:20px; } .section-heading { flex-direction:column; } .hero { padding-top:36px; } }
 @media (max-width:760px) { .home-chapter { grid-template-columns:1fr; gap:12px; padding:22px 0; } .home-chapter-copy { position:static; } .home-story-nav { top:6px; } .home-story-nav a { font-size:.72rem; } .feature-story-grid, .story-data-summary, .academic-process, .reproducibility-grid { grid-template-columns:1fr; } }
