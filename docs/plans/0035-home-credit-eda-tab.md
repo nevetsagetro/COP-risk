@@ -2,7 +2,7 @@
 
 ## Status
 
-- Status: active.
+- Status: complete.
 - Scope: an independent Home Credit EDA tab for curious users and academic
   inspection.
 - This plan does not authorize implementation, model retraining, or changes to
@@ -10,8 +10,9 @@
 - Source of truth: `AGENTS.md`, `PLANS.md`, and the Home Credit academic plans.
 
 Implementation checkpoint: the EDA report, read-only endpoint, and independent
-frontend tab are implemented. The read-only review is complete_pending_finisher;
-the milestone finisher remains pending.
+frontend tab are implemented. The read-only review and milestone finisher are
+complete. The full suite timeout remains documented as an existing Model Lab
+integration-test risk.
 
 ## Objective
 
