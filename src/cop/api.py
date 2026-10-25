@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import plotly  # type: ignore[import-untyped]
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
@@ -20,6 +20,13 @@ CONFIG_PATH = Path(
 )
 WEB_DIRECTORY = Path(__file__).resolve().parents[2] / "app" / "web"
 PLOTLY_ASSET = Path(plotly.__file__).resolve().parent / "package_data" / "plotly.min.js"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _project_path(value: str) -> Path:
+    """Resolve local configuration paths independently from the launch cwd."""
+    path = Path(value)
+    return path if path.is_absolute() else PROJECT_ROOT / path
 
 
 class PredictionRequest(BaseModel):
@@ -41,20 +48,22 @@ def get_service() -> AcademicService:
 
 @lru_cache(maxsize=1)
 def get_home_credit_service() -> HomeCreditService:
-    snapshot = Path(
+    snapshot = _project_path(
         os.environ.get("COP_HOME_CREDIT_SNAPSHOT", "data/processed/home-credit-static")
     )
     configured_run = os.environ.get("COP_HOME_CREDIT_RUN")
     if configured_run:
-        run = Path(configured_run)
+        run = _project_path(configured_run)
     else:
-        candidates = sorted(Path("runs/home-credit-static").glob("*/results.json"))
+        candidates = sorted(
+            (PROJECT_ROOT / "runs/home-credit-static").glob("*/results.json")
+        )
         if not candidates:
             raise FileNotFoundError(
                 "Home Credit static baseline artifacts are not available"
             )
         run = candidates[-1].parent
-    comparison_snapshot = Path(
+    comparison_snapshot = _project_path(
         os.environ.get(
             "COP_HOME_CREDIT_V2_SNAPSHOT", "data/processed/home-credit-static-v2"
         )
@@ -62,10 +71,10 @@ def get_home_credit_service() -> HomeCreditService:
     configured_comparison_run = os.environ.get("COP_HOME_CREDIT_V2_RUN")
     comparison_run: Path | None
     if configured_comparison_run:
-        comparison_run = Path(configured_comparison_run)
+        comparison_run = _project_path(configured_comparison_run)
     else:
         comparison_runs = sorted(
-            Path("runs/home-credit-static-v2").glob("*/results.json")
+            (PROJECT_ROOT / "runs/home-credit-static-v2").glob("*/results.json")
         )
         comparison_run = comparison_runs[-1].parent if comparison_runs else None
     return HomeCreditService(
@@ -219,5 +228,37 @@ async def asset(asset_name: str) -> PlainTextResponse:
 
 
 @app.get("/", include_in_schema=False)
-async def index() -> HTMLResponse:
-    return HTMLResponse((WEB_DIRECTORY / "index.html").read_text(encoding="utf-8"))
+async def index(request: Request) -> HTMLResponse:
+    markup = (WEB_DIRECTORY / "index.html").read_text(encoding="utf-8")
+    if request.query_params.get("dataset") == "uci":
+        markup = (
+            markup.replace(
+                'class="dataset-tab is-active" id="tab-home-button"',
+                'class="dataset-tab" id="tab-home-button"',
+            )
+            .replace(
+                'id="tab-home-button" type="button" role="tab" aria-selected="true"',
+                'id="tab-home-button" type="button" role="tab" aria-selected="false"',
+            )
+            .replace(
+                'class="dataset-tab" id="tab-uci-button"',
+                'class="dataset-tab is-active" id="tab-uci-button"',
+            )
+            .replace(
+                'id="tab-uci-button" type="button" role="tab" aria-selected="false"',
+                'id="tab-uci-button" type="button" role="tab" aria-selected="true"',
+            )
+            .replace(
+                'id="tab-home" class="dataset-tab-panel" role="tabpanel" '
+                'aria-labelledby="tab-home-button">',
+                'id="tab-home" class="dataset-tab-panel" role="tabpanel" '
+                'aria-labelledby="tab-home-button" hidden>',
+            )
+            .replace(
+                'id="tab-uci" class="dataset-tab-panel" role="tabpanel" '
+                'aria-labelledby="tab-uci-button" hidden>',
+                'id="tab-uci" class="dataset-tab-panel" role="tabpanel" '
+                'aria-labelledby="tab-uci-button">',
+            )
+        )
+    return HTMLResponse(markup)

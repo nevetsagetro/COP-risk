@@ -8,7 +8,7 @@ from typing import Any
 
 import pandas as pd
 
-from cop.data.home_credit import HOME_CREDIT_TARGET
+from cop.data.home_credit import HOME_CREDIT_FEATURE_VERSION_V0, HOME_CREDIT_TARGET
 
 EDA_DISTRIBUTION_FEATURES = (
     "AMT_INCOME_TOTAL",
@@ -171,7 +171,7 @@ def build_home_credit_eda_report(
     return {
         "artifact_version": 1,
         "dataset_id": manifest["dataset_id"],
-        "feature_version": manifest.get("feature_version", "unknown"),
+        "feature_version": HOME_CREDIT_FEATURE_VERSION_V0,
         "authorized_use": manifest["authorized_use"],
         "target": HOME_CREDIT_TARGET,
         "test_status": "unopened",

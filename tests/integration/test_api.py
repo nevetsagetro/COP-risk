@@ -6,7 +6,7 @@ from typing import Any
 import httpx
 import pytest
 
-from cop.api import app
+from cop.api import app, get_home_credit_service
 from cop.features.uci import UCI_APPROVED_FEATURES
 
 
@@ -18,6 +18,33 @@ async def _request(method: str, path: str, **kwargs: Any) -> httpx.Response:
 
 def request(method: str, path: str, **kwargs: Any) -> httpx.Response:
     return asyncio.run(_request(method, path, **kwargs))
+
+
+def test_home_credit_paths_are_stable_when_launched_outside_project(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Any
+) -> None:
+    get_home_credit_service.cache_clear()
+    monkeypatch.chdir(tmp_path)
+
+    service = get_home_credit_service()
+
+    assert service.eda_report()["test_status"] == "unopened"
+    get_home_credit_service.cache_clear()
+
+
+def test_uci_dataset_url_selects_uci_panel_in_server_html() -> None:
+    response = request("GET", "/?dataset=uci")
+
+    assert response.status_code == 200
+    assert 'id="tab-home" class="dataset-tab-panel"' in response.text
+    assert (
+        'id="tab-home" class="dataset-tab-panel" role="tabpanel" '
+        'aria-labelledby="tab-home-button" hidden>'
+    ) in response.text
+    assert (
+        'id="tab-uci" class="dataset-tab-panel" role="tabpanel" '
+        'aria-labelledby="tab-uci-button">'
+    ) in response.text
 
 
 def test_health_and_static_frontend() -> None:
@@ -91,7 +118,7 @@ def test_health_and_static_frontend() -> None:
     assert "Which trial performed best?" in frontend.text
     assert 'id="journey-panel"' in frontend.text
     assert "From dataset to final model decision" in frontend.text
-    assert "/assets/app.js?v=model-lab-75" in frontend.text
+    assert "/assets/app.js?v=model-lab-77" in frontend.text
     assert 'href="/assets/styles.css?v=home-layout-71"' in frontend.text
     assert 'class="model-contract-flow"' in frontend.text
     assert "TARGET probability" in frontend.text
@@ -117,7 +144,12 @@ def test_health_and_static_frontend() -> None:
     )
     assert "function resizeUciCharts()" in app_script.text
     assert "function loadHomeEda()" in app_script.text
+    assert (
+        "status.textContent = `UCI evidence unavailable: ${error.message}`"
+        in app_script.text
+    )
     assert 'api("/api/home-credit/eda")' in app_script.text
+    assert 'window.location.hash==="#home-eda-panel"' in app_script.text
     assert (
         'chapters.forEach(chapter=>chapter.classList.add("is-visible"))'
         in app_script.text
