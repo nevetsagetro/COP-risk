@@ -128,7 +128,16 @@ th small { color:var(--blue); font-size:.68rem; text-transform:none; letter-spac
 #model-lab-table td:nth-child(n+4) { font-variant-numeric:tabular-nums; }
 #model-lab-table td:nth-child(5) { color:var(--muted); }
 #home-credit-table td:nth-child(2) { white-space:normal; min-width:150px; }
-.chart { display:flex; justify-content:center; align-items:center; min-height:390px; width:100%; margin-inline:auto; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#fbfcfe; }
+#home-iteration-table { table-layout:fixed; min-width:0; font-size:.82rem; }
+#home-iteration-table th, #home-iteration-table td { width:auto; white-space:normal; overflow-wrap:anywhere; word-break:break-word; padding:9px 7px; vertical-align:top; }
+#home-iteration-table th:nth-child(1) { width:12%; }
+#home-iteration-table th:nth-child(2) { width:13%; }
+#home-iteration-table th:nth-child(3) { width:28%; }
+#home-iteration-table th:nth-child(4) { width:11%; }
+#home-iteration-table th:nth-child(5) { width:15%; }
+#home-iteration-table th:nth-child(6) { width:8%; }
+#home-iteration-table th:nth-child(7) { width:13%; }
+.chart { display:flex; justify-content:center; align-items:center; min-height:390px; width:100%; margin:14px auto; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#fbfcfe; }
 .chart > .plotly-graph-div { flex:1 1 auto; align-self:center; width:100% !important; min-width:0; margin-inline:auto; }
 .uci-chart { display:block; }
 .uci-chart > .plotly-graph-div { width:100% !important; margin:0; }

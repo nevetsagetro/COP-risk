@@ -87,7 +87,7 @@ def test_health_and_static_frontend() -> None:
     assert "Which trial performed best?" in frontend.text
     assert 'id="journey-panel"' in frontend.text
     assert "From dataset to final model decision" in frontend.text
-    assert "/assets/app.js?v=model-lab-47" in frontend.text
+    assert "/assets/app.js?v=model-lab-48" in frontend.text
     assert 'id="roc-chart" class="chart uci-chart chart-wide"' in frontend.text
     assert 'id="model-lab-chart" class="model-lab-chart-shell"' in frontend.text
     assert 'href="#tab-uci-button"' not in frontend.text
@@ -113,6 +113,7 @@ def test_health_and_static_frontend() -> None:
     assert styles.status_code == 200
     assert "prefers-reduced-motion" in styles.text
     assert ".home-chapter.is-visible" in styles.text
+    assert "#home-iteration-table { table-layout:fixed" in styles.text
     assert "You can apply more changes before calculating" in app_script.text
     assert "renderCaseSummary" in app_script.text
     assert "await setupExamples()" in app_script.text
