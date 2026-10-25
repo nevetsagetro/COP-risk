@@ -3,23 +3,29 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>COP · Home Credit Decision Lab</title>
+    <title>COP · Credit Risk Model Labs</title>
     <link rel="stylesheet" href="/assets/styles.css" />
     <script src="/assets/plotly.min.js?v=english-1"></script>
   </head>
   <body>
     <header class="hero">
       <button id="language-toggle" class="language-toggle" type="button" aria-label="Switch to Spanish">ES</button>
-      <div class="eyebrow">PORTFOLIO · STATIC ACADEMIC BENCHMARK</div>
-      <h1>COP · Home Credit Decision Lab</h1>
+      <div class="eyebrow">PORTFOLIO · TWO INDEPENDENT ACADEMIC BENCHMARKS</div>
+      <h1>COP · Credit Risk Model Labs</h1>
       <p class="hero-copy">
-        A visual walkthrough of how a model is selected, evaluated and used to
-        prioritize a bounded review policy on the Home Credit benchmark.
+        Two independent public-data labs: Home Credit for the full model-development
+        workflow, and UCI for the compact reference experiment.
       </p>
       <div class="warning">Not approved for real credit decisions.</div>
     </header>
 
     <main>
+      <nav class="dataset-tabs" aria-label="Dataset views" role="tablist">
+        <button class="dataset-tab is-active" id="tab-home-button" type="button" role="tab" aria-selected="true" aria-controls="tab-home">Home Credit Decision Lab</button>
+        <button class="dataset-tab" id="tab-uci-button" type="button" role="tab" aria-selected="false" aria-controls="tab-uci">UCI Reference Baseline</button>
+      </nav>
+
+      <div id="tab-home" class="dataset-tab-panel" role="tabpanel" aria-labelledby="tab-home-button">
       <section class="story-grid" aria-label="Idea principal">
         <article class="story-card"><span>01</span><h2>Inspect</h2><p>We verify the Home Credit snapshot, entity split and feature contract.</p></article>
         <article class="story-card"><span>02</span><h2>Compare</h2><p>We search Logistic Regression and LightGBM candidates with train cross-validation.</p></article>
@@ -35,7 +41,7 @@
         <div class="eyebrow">QUICK TOUR</div>
         <h2>If you only have two minutes</h2>
         <ol><li>Read the three metrics: <b>coverage</b>, <b>alert accuracy</b> and <b>balance</b>.</li><li>Compare both models in their cards without mixing their curves.</li><li>Move the threshold and watch what each model gains and loses.</li></ol>
-        <div class="jump-links"><a href="#journey-panel">0 · Follow the journey</a><a href="#home-credit-panel">1 · Home Credit results</a><a href="#home-credit-policy-panel">2 · Decide under capacity</a><a href="#tab-uci-button">3 · UCI reference</a></div>
+        <div class="jump-links"><a href="#journey-panel">0 · Follow the journey</a><a href="#home-credit-panel">1 · Home Credit results</a><a href="#home-credit-policy-panel">2 · Decide under capacity</a></div>
       </section>
 
       <section class="panel journey-panel" id="journey-panel">
@@ -50,13 +56,6 @@
           <article class="journey-step journey-decision"><span>06 · DECISION</span><h3>Make a bounded academic conclusion</h3><p id="journey-decision">LightGBM is currently strongest under the declared static validation protocol. This does not authorize production use.</p><small>Final test: <b>closed by default</b></small></article>
         </div>
       </section>
-
-      <nav class="dataset-tabs" aria-label="Dataset views" role="tablist">
-        <button class="dataset-tab is-active" id="tab-home-button" type="button" role="tab" aria-selected="true" aria-controls="tab-home">Home Credit Decision Lab</button>
-        <button class="dataset-tab" id="tab-uci-button" type="button" role="tab" aria-selected="false" aria-controls="tab-uci">UCI Reference Baseline</button>
-      </nav>
-
-      <div id="tab-home" class="dataset-tab-panel" role="tabpanel" aria-labelledby="tab-home-button">
 
       <nav class="home-story-nav" aria-label="Home Credit evidence chapters">
         <a href="#home-chapter-context">01 · Context</a><a href="#home-chapter-data">02 · Data</a><a href="#home-chapter-features">03 · Features</a><a href="#home-chapter-models">04 · Iterations</a><a href="#home-chapter-neural">05 · Neural challenger</a><a href="#home-chapter-validation">06 · Validation</a><a href="#home-chapter-policy">07 · Policy</a><a href="#home-chapter-conclusion">08 · Conclusion</a>
@@ -208,8 +207,8 @@
       </section>
       </div>
     </main>
-    <footer>Home Credit Default Risk · static academic benchmark · UCI retained as reference · final tests closed</footer>
-    <script src="/assets/app.js?v=model-lab-35"></script>
+    <footer>COP · two independent public academic benchmarks · final tests closed</footer>
+    <script src="/assets/app.js?v=model-lab-36"></script>
     <script src="/assets/language.js?v=toggle-5"></script>
   </body>
 </html>
