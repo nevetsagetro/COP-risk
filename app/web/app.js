@@ -197,15 +197,27 @@ async function loadUciReference() {
     document.querySelector("#tab-uci").innerHTML=`<div class="panel"><h2>Could not load the UCI reference</h2><p>${error.message}</p></div>`;
   }
 }
+function persistDataset(target) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("dataset", target === "tab-uci" ? "uci" : "home");
+  window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+}
+function activateDataset(button, persist = true) {
+  const tabs = document.querySelectorAll(".dataset-tab");
+  const target = button.dataset.tab || button.getAttribute("aria-controls");
+  tabs.forEach(item => { const active = item === button; item.classList.toggle("is-active", active); item.setAttribute("aria-selected", String(active)); });
+  document.querySelectorAll(".dataset-tab-panel").forEach(panel => { panel.hidden = panel.id !== target; });
+  if (persist) persistDataset(target);
+  if (target === "tab-uci") loadUciReference();
+  resizeCharts(`#${target}`);
+}
 function setupDatasetTabs() {
   const tabs = document.querySelectorAll(".dataset-tab");
-  tabs.forEach(button => button.addEventListener("click", () => {
-    const target = button.dataset.tab || button.getAttribute("aria-controls");
-    tabs.forEach(item => { const active = item === button; item.classList.toggle("is-active", active); item.setAttribute("aria-selected", String(active)); });
-    document.querySelectorAll(".dataset-tab-panel").forEach(panel => { panel.hidden = panel.id !== target; });
-    if (target === "tab-uci") loadUciReference();
-    resizeCharts(`#${target}`);
-  }));
+  tabs.forEach(button => button.addEventListener("click", () => activateDataset(button)));
+  const requestedDataset = new URLSearchParams(window.location.search).get("dataset");
+  const initialTarget = requestedDataset === "uci" || window.location.hash === "#tab-uci" ? "tab-uci" : "tab-home";
+  const initialButton = document.querySelector(`[aria-controls="${initialTarget}"]`);
+  if (initialButton) activateDataset(initialButton, false);
 }
 function readModelLabSession() {
   try {
