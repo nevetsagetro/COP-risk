@@ -64,6 +64,9 @@ def test_health_and_static_frontend() -> None:
     assert 'id="home-feature-ablation-chart"' in frontend.text
     assert 'id="home-classical-benchmark"' in frontend.text
     assert 'id="home-classical-benchmark-chart"' in frontend.text
+    assert 'id="home-chapter-neural"' in frontend.text
+    assert 'id="home-deep-learning-chart"' in frontend.text
+    assert 'id="home-deep-learning-comparison"' in frontend.text
     assert 'id="home-reproducibility"' in frontend.text
     assert "academic-process" in frontend.text
     assert 'id="home-audit-only"' in frontend.text
@@ -84,7 +87,7 @@ def test_health_and_static_frontend() -> None:
     assert "Which trial performed best?" in frontend.text
     assert 'id="journey-panel"' in frontend.text
     assert "From dataset to final model decision" in frontend.text
-    assert "/assets/app.js?v=model-lab-30" in frontend.text
+    assert "/assets/app.js?v=model-lab-31" in frontend.text
     assert 'id="home-iteration-result"' in frontend.text
     assert "/assets/language.js?v=toggle-5" in frontend.text
     app_script = request("GET", "/assets/app.js?v=model-lab-5")
@@ -202,6 +205,10 @@ def test_read_only_analytical_endpoints_keep_test_closed() -> None:
             "train_cross_validation"
         )
         assert academic["classical_benchmark"]["models"]
+    if academic["deep_learning"]["status"] == "available":
+        assert academic["deep_learning"]["test_status"] == "unopened"
+        assert academic["deep_learning"]["architecture"] == [128, 64]
+        assert academic["deep_learning"]["validation"]["average_precision"] > 0
     assert all(
         row["iteration_comparison"]["selected_trial"] == row["selected_trial"]
         for row in academic["models"]

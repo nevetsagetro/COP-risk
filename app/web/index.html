@@ -59,7 +59,7 @@
       <div id="tab-home" class="dataset-tab-panel" role="tabpanel" aria-labelledby="tab-home-button">
 
       <nav class="home-story-nav" aria-label="Home Credit evidence chapters">
-        <a href="#home-chapter-context">01 · Context</a><a href="#home-chapter-data">02 · Data</a><a href="#home-chapter-features">03 · Features</a><a href="#home-chapter-models">04 · Iterations</a><a href="#home-chapter-validation">05 · Validation</a><a href="#home-chapter-policy">06 · Policy</a><a href="#home-chapter-conclusion">07 · Conclusion</a>
+        <a href="#home-chapter-context">01 · Context</a><a href="#home-chapter-data">02 · Data</a><a href="#home-chapter-features">03 · Features</a><a href="#home-chapter-models">04 · Iterations</a><a href="#home-chapter-neural">05 · Neural challenger</a><a href="#home-chapter-validation">06 · Validation</a><a href="#home-chapter-policy">07 · Policy</a><a href="#home-chapter-conclusion">08 · Conclusion</a>
       </nav>
 
       <section class="home-story" id="home-academic-story" aria-label="Home Credit academic evidence story">
@@ -84,18 +84,23 @@
           <div class="home-chapter-stage"><div class="academic-process" aria-label="Model development process"><article><b>1 · Define</b><span>Freeze data, features, seed and metric.</span></article><article><b>2 · Fit</b><span>Train candidates inside the training split.</span></article><article><b>3 · Compare</b><span>Use cross-validation to select a candidate.</span></article><article><b>4 · Check</b><span>Use validation once to test the conclusion.</span></article></div><div id="home-trial-chart" class="chart chart-wide" role="img" aria-label="Home Credit model trial comparison"></div><div id="home-classical-benchmark" class="reproducibility-card" aria-live="polite">Loading classical benchmark…</div><div id="home-classical-benchmark-chart" class="chart chart-wide" role="img" aria-label="Classical model benchmark validation comparison"></div><p id="home-iteration-result" class="lab-conclusion" aria-live="polite">Loading the iteration result…</p><div id="home-iteration-summary" class="model-cards"></div><div class="table-wrap"><table id="home-iteration-table"><thead><tr><th>Model</th><th>Iteration</th><th>Parameters</th><th>CV AP</th><th>Fold variation</th><th>Rank</th><th>Validation AP</th></tr></thead><tbody></tbody></table></div></div>
         </article>
 
+        <article class="home-chapter" id="home-chapter-neural" data-story-chapter tabindex="-1">
+          <div class="home-chapter-copy"><span class="chapter-number">05 · NEURAL CHALLENGER</span><h2>Does more complexity add evidence?</h2><p>The MLP is a controlled challenger, not an automatic winner. It uses the same feature snapshot and seed, learns only from train, stops using a holdout carved from train, and is evaluated once on validation.</p><div class="story-checkpoint"><b>How to read it</b><span>Compare the validation AP with the classical candidates, then inspect the learning curve and the limits of this static experiment.</span></div></div>
+          <div class="home-chapter-stage"><div id="home-deep-learning" class="reproducibility-card" aria-live="polite">Loading neural benchmark…</div><div id="home-deep-learning-chart" class="chart chart-wide" role="img" aria-label="Home Credit neural learning curve"></div><div id="home-deep-learning-comparison" class="chart chart-wide" role="img" aria-label="Home Credit neural and classical validation comparison"></div></div>
+        </article>
+
         <article class="home-chapter" id="home-chapter-validation" data-story-chapter tabindex="-1">
-          <div class="home-chapter-copy"><span class="chapter-number">05 · VALIDATION</span><h2>Did the selected candidates hold outside cross-validation?</h2><p>Train-CV supports selection; validation is the separate check. Ranking metrics and probability-error metrics answer different questions, so they are shown with their own scales.</p><div class="story-checkpoint"><b>Read it carefully</b><span>A validation result is evidence for this static split, not a production guarantee.</span></div></div>
+          <div class="home-chapter-copy"><span class="chapter-number">06 · VALIDATION</span><h2>Did the selected candidates hold outside cross-validation?</h2><p>Train-CV supports selection; validation is the separate check. Ranking metrics and probability-error metrics answer different questions, so they are shown with their own scales.</p><div class="story-checkpoint"><b>Read it carefully</b><span>A validation result is evidence for this static split, not a production guarantee.</span></div></div>
           <div class="home-chapter-stage"><div id="home-validation-chart" class="chart chart-wide" role="img" aria-label="Home Credit validation metric comparison"></div><div id="home-calibration-chart" class="chart chart-wide" role="img" aria-label="Home Credit validation calibration chart"></div><p id="home-calibration-note" class="technical-note" aria-live="polite"></p></div>
         </article>
 
         <article class="home-chapter" id="home-chapter-policy" data-story-chapter tabindex="-1">
-          <div class="home-chapter-copy"><span class="chapter-number">06 · POLICY</span><h2>What changes when review capacity changes?</h2><p>Instead of pretending one threshold is universal, we rank validation cases and vary the fraction available for review. More capacity usually finds more target-positive cases while reducing precision.</p><div class="story-checkpoint"><b>Policy reading</b><span>Capacity is an operating assumption, not a model metric.</span></div></div>
+          <div class="home-chapter-copy"><span class="chapter-number">07 · POLICY</span><h2>What changes when review capacity changes?</h2><p>Instead of pretending one threshold is universal, we rank validation cases and vary the fraction available for review. More capacity usually finds more target-positive cases while reducing precision.</p><div class="story-checkpoint"><b>Policy reading</b><span>Capacity is an operating assumption, not a model metric.</span></div></div>
           <div class="home-chapter-stage"><div id="home-policy-chart" class="chart chart-wide" role="img" aria-label="Home Credit precision and recall by review capacity"></div><div id="home-policy-lift-chart" class="chart chart-wide" role="img" aria-label="Home Credit lift by review capacity"></div></div>
         </article>
 
         <article class="home-chapter" id="home-chapter-conclusion" data-story-chapter tabindex="-1">
-          <div class="home-chapter-copy"><span class="chapter-number">07 · CONCLUSION</span><h2>What can we conclude?</h2><p id="home-academic-conclusion" aria-live="polite">Loading the academic conclusion…</p><div class="story-checkpoint"><b>Boundary</b><span>Static benchmark only. No temporal stability, production validity, or real-credit claim.</span></div></div>
+          <div class="home-chapter-copy"><span class="chapter-number">08 · CONCLUSION</span><h2>What can we conclude?</h2><p id="home-academic-conclusion" aria-live="polite">Loading the academic conclusion…</p><div class="story-checkpoint"><b>Boundary</b><span>Static benchmark only. No temporal stability, production validity, or real-credit claim.</span></div></div>
           <div class="home-chapter-stage"><div id="home-iteration-contract" class="iteration-contract"></div></div>
         </article>
       </section>
@@ -133,7 +138,7 @@
 
       <section class="panel" id="model-lab-panel">
         <div class="section-heading"><div><div class="eyebrow">UCI REFERENCE MODEL DEVELOPMENT</div><h2>How did the original reference baseline improve?</h2></div><button id="run-model-lab" class="button" type="button" hidden>Retry experiment</button></div>
-        <p class="lead">This preserved reference experiment compares Logistic Regression, LightGBM and KNN on the original UCI baseline. The primary Home Credit results are shown in the static benchmark panel below.</p>
+        <p class="lead">This preserved reference experiment compares Logistic Regression, LightGBM and KNN on the original UCI baseline. It is independent from the Home Credit vertical; its metrics and charts remain in this tab.</p>
         <p id="model-lab-status" class="lab-status" role="status">Loading the cached academic experiment…</p>
         <div id="model-lab-results" hidden>
           <div class="lab-flow" aria-label="Experiment flow"><article><b>1 · Search space</b><span>Define controlled parameter combinations.</span></article><article><b>2 · Cross-validation</b><span>Fit every trial across train folds.</span></article><article><b>3 · Select</b><span>Rank by Average Precision, then ROC-AUC.</span></article><article><b>4 · Validate</b><span>Evaluate the selected trial once on validation.</span></article></div>
@@ -204,7 +209,7 @@
       </div>
     </main>
     <footer>Home Credit Default Risk · static academic benchmark · UCI retained as reference · final tests closed</footer>
-    <script src="/assets/app.js?v=model-lab-30"></script>
+    <script src="/assets/app.js?v=model-lab-31"></script>
     <script src="/assets/language.js?v=toggle-5"></script>
   </body>
 </html>
