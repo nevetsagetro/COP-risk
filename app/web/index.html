@@ -142,7 +142,7 @@
         <div id="model-lab-results" hidden>
           <div class="lab-flow" aria-label="Experiment flow"><article><b>1 · Search space</b><span>Define controlled parameter combinations.</span></article><article><b>2 · Cross-validation</b><span>Fit every trial across train folds.</span></article><article><b>3 · Select</b><span>Rank by Average Precision, then ROC-AUC.</span></article><article><b>4 · Validate</b><span>Evaluate the selected trial once on validation.</span></article></div>
           <p id="model-lab-conclusion" class="lab-conclusion"></p>
-          <div id="model-lab-chart" class="chart compact"></div>
+          <div id="model-lab-chart" class="chart uci-chart compact"></div>
           <h3 class="lab-subheading">Which trial performed best?</h3>
           <p class="technical-note">Trials are ranked by Average Precision from train cross-validation. The dot shows the mean, the whisker shows fold variation, and the selected trial is highlighted.</p>
           <div id="model-lab-summary" class="model-cards"></div>
@@ -154,7 +154,7 @@
       <section class="panel" id="roc-panel">
         <div class="section-heading"><div><div class="eyebrow">UCI REFERENCE · CHART 01</div><h2>Can the reference baseline separate defaults?</h2></div></div>
         <p class="lead">Each point is a different alert threshold. The curve closest to the top-left finds more defaults with fewer false alarms. The chart letters match the notes below.</p>
-        <div id="roc-chart" class="chart chart-wide"></div>
+        <div id="roc-chart" class="chart uci-chart chart-wide"></div>
         <div id="roc-annotations" class="annotation-legend"></div>
         <div class="note-row"><div><b>Horizontal</b><span>Allowed false alarms</span></div><div><b>Vertical</b><span>Risk cases found</span></div><div><b>Diagonal</b><span>Random-like result</span></div></div>
       </section>
@@ -162,13 +162,13 @@
       <section class="panel" id="probability-panel">
         <div class="section-heading"><div><div class="eyebrow">UCI REFERENCE · CHART 02</div><h2>How are reference probabilities distributed?</h2></div></div>
         <p class="lead">Each bar groups cases with a similar estimated probability. The tallest bar only shows where there are more cases; it does not mean those cases are the riskiest.</p>
-        <div class="chart-card"><h3>Logistic Regression vs LightGBM</h3><div id="probability-chart-comparison" class="chart chart-wide"></div><p class="technical-note">The bars overlap with transparency so you can compare where each model concentrates its estimated probabilities. Use the legend and hover details to distinguish the models.</p></div>
+        <div class="chart-card"><h3>Logistic Regression vs LightGBM</h3><div id="probability-chart-comparison" class="chart uci-chart chart-wide"></div><p class="technical-note">The bars overlap with transparency so you can compare where each model concentrates its estimated probabilities. Use the legend and hover details to distinguish the models.</p></div>
       </section>
 
       <section class="panel" id="calibration-panel">
         <div class="section-heading"><div><div class="eyebrow">PROBABILITY QUALITY</div><h2>Do estimated probabilities match observed rates?</h2></div></div>
         <p class="lead">A model can rank cases well and still give probabilities that are too high or too low. Each point groups validation cases by estimated probability and compares the estimate with the observed default rate.</p>
-        <div id="calibration-chart" class="chart chart-wide"></div>
+        <div id="calibration-chart" class="chart uci-chart chart-wide"></div>
         <p class="technical-note">The diagonal represents <b>Perfect calibration</b>. Points above it mean defaults occurred more often than predicted; points below it mean the model predicted more risk than observed. This is validation evidence, not a production guarantee.</p>
       </section>
 
@@ -181,7 +181,7 @@
         <div id="threshold-meaning" class="threshold-meaning">A threshold of 0.50 means: estimated probability ≥ 50% → academic alert. It is not a certainty.</div>
         <div class="threshold-explainer"><h3 id="scene-title">Seek balance</h3><p id="scene-copy"></p></div>
         <div id="threshold-model-cards" class="model-cards"></div>
-        <div class="chart-grid two-models"><article class="chart-card"><h3>Logistic Regression</h3><div id="threshold-chart-logistic_regression" class="chart compact"></div></article><article class="chart-card"><h3>LightGBM</h3><div id="threshold-chart-lightgbm" class="chart compact"></div></article></div>
+        <div class="chart-grid two-models"><article class="chart-card"><h3>Logistic Regression</h3><div id="threshold-chart-logistic_regression" class="chart uci-chart compact"></div></article><article class="chart-card"><h3>LightGBM</h3><div id="threshold-chart-lightgbm" class="chart uci-chart compact"></div></article></div>
       </section>
 
       <section class="panel" id="capacity-panel">
@@ -208,7 +208,7 @@
       </div>
     </main>
     <footer>COP · two independent public academic benchmarks · final tests closed</footer>
-    <script src="/assets/app.js?v=model-lab-39"></script>
+    <script src="/assets/app.js?v=model-lab-40"></script>
     <script src="/assets/language.js?v=toggle-5"></script>
   </body>
 </html>
