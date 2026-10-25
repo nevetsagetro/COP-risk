@@ -87,7 +87,7 @@ def test_health_and_static_frontend() -> None:
     assert "Which trial performed best?" in frontend.text
     assert 'id="journey-panel"' in frontend.text
     assert "From dataset to final model decision" in frontend.text
-    assert "/assets/app.js?v=model-lab-45" in frontend.text
+    assert "/assets/app.js?v=model-lab-46" in frontend.text
     assert 'id="roc-chart" class="chart uci-chart chart-wide"' in frontend.text
     assert 'id="model-lab-chart" class="model-lab-chart-shell"' in frontend.text
     assert 'href="#tab-uci-button"' not in frontend.text
@@ -102,6 +102,7 @@ def test_health_and_static_frontend() -> None:
     assert "function resizeCharts(scope)" in app_script.text
     assert "function persistDataset(target)" in app_script.text
     assert 'searchParams.set("dataset"' in app_script.text
+    assert 'xanchor:"center"' in app_script.text
     assert "chartRows.length * 38 + 100" in app_script.text
     assert "xshift: 12" in app_script.text
     language_script = request("GET", "/assets/language.js?v=toggle-3")
