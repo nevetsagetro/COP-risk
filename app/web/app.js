@@ -71,30 +71,29 @@ function renderModelLab(data) {
   const best = selectedModels.reduce((winner, item) => item.candidate.cross_validation.average_precision > winner.candidate.cross_validation.average_precision ? item : winner);
   document.querySelector("#model-lab-conclusion").innerHTML = `<b>Current academic comparison:</b> ${modelLabel(best.name)} is the strongest selected candidate by train-CV Average Precision (${fmt(best.candidate.cross_validation.average_precision)}). This is a model-selection result for the defined metric, not an automatic production winner.`;
   document.querySelector("#journey-decision").textContent = `${modelLabel(best.name)} is currently strongest under train-CV Average Precision (${fmt(best.candidate.cross_validation.average_precision)}). The threshold is then reviewed on validation; this is an academic conclusion, not a production approval.`;
-  const chartRows = Object.entries(data.models).flatMap(([name, payload]) => payload.candidates.map(candidate => ({name, candidate})));
-  const apValues = chartRows.map(({candidate}) => candidate.cross_validation.average_precision);
+  const chartContainer = document.querySelector("#model-lab-charts");
+  chartContainer.innerHTML = Object.keys(data.models).map(name => `<article class="model-lab-chart-card"><h4>${modelLabel(name)}</h4><div id="model-lab-chart-${name}" class="model-lab-chart" role="img" aria-label="${modelLabel(name)} trial comparison"></div></article>`).join("");
+  Object.entries(data.models).forEach(([name, payload]) => renderModelTrialChart(name, payload));
+  resizeCharts("#model-lab-charts");
+}
+function renderModelTrialChart(name, payload) {
+  const candidates = payload.candidates;
+  const apValues = candidates.map(candidate => candidate.cross_validation.average_precision);
   const bestAp = Math.max(...apValues);
   const minimumAp = Math.min(...apValues);
   const spread = Math.max(bestAp - minimumAp, 0.01);
-  Plotly.newPlot("model-lab-chart", [{
+  Plotly.newPlot(`model-lab-chart-${name}`, [{
     type: "scatter",
     mode: "markers+text",
-    orientation: "h",
-    y: chartRows.map(({name, candidate}) => trialLabel(name, candidate)),
+    y: candidates.map(candidate => `Trial ${String(candidate.trial_id).split("-trial-")[1]}`),
     x: apValues,
-    error_x: {type: "data", array: chartRows.map(({candidate}) => candidate.cross_validation_std.average_precision), visible: true},
-    text: chartRows.map(({candidate}) => candidate.selected ? `Selected · #${candidate.rank}` : `#${candidate.rank}`),
+    error_x: {type: "data", array: candidates.map(candidate => candidate.cross_validation_std.average_precision), visible: true},
+    text: candidates.map(candidate => candidate.selected ? `Selected · #${candidate.rank}` : `#${candidate.rank}`),
     textposition: "middle right",
-    marker: {size: chartRows.map(({candidate}) => candidate.selected ? 13 : 9), color: chartRows.map(({name, candidate}) => candidate.selected ? "#2563eb" : name === "knn" ? "#94a3b8" : "#b9c9e8")},
-    customdata: chartRows.map(({candidate}) => [parameterText(candidate.parameters), candidate.cross_validation_std.average_precision, candidate.rank]),
-    hovertemplate: "%{y}<br>CV AP: %{x:.2%} ± %{customdata[1]:.2%}<br>Rank: %{customdata[2]}<br>%{customdata[0]}<extra></extra>"
-  }], {height: Math.max(360, chartRows.length * 44 + 90), margin:{l:210,r:145,t:24,b:66}, xaxis:{title:"Average Precision · train CV",tickformat:".1%",range:[Math.max(0, minimumAp - spread * 0.35), Math.min(1, bestAp + spread * 0.35)]}, yaxis:{autorange:"reversed",automargin:false}, showlegend:false}, plotConfig);
-  requestAnimationFrame(() => {
-    ["#model-lab-chart"].forEach(selector => {
-      const chart = document.querySelector(selector);
-      if (chart && window.Plotly) Plotly.Plots.resize(chart);
-    });
-  });
+    marker: {size: candidates.map(candidate => candidate.selected ? 13 : 9), color: candidates.map(candidate => candidate.selected ? chartColors.logistic_regression : chartColors.reference)},
+    customdata: candidates.map(candidate => [parameterText(candidate.parameters), candidate.cross_validation_std.average_precision, candidate.rank]),
+    hovertemplate: `${modelLabel(name)} · %{y}<br>CV AP: %{x:.2%} ± %{customdata[1]:.2%}<br>Rank: %{customdata[2]}<br>%{customdata[0]}<extra></extra>`
+  }], {height: Math.max(280, candidates.length * 48 + 80), margin:{l:82,r:120,t:12,b:58}, xaxis:{title:"Train-CV AP",tickformat:".1%",range:[Math.max(0, minimumAp - spread * 0.35), Math.min(1, bestAp + spread * 0.35)]}, yaxis:{autorange:"reversed",automargin:false}, showlegend:false}, plotConfig);
 }
 function renderHomeCredit(data) {
   document.querySelector("#home-credit-status").textContent=`${data.snapshot.rows.toLocaleString()} rows · test ${data.test_status}`;
