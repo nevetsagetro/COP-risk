@@ -87,7 +87,7 @@ def test_health_and_static_frontend() -> None:
     assert "Which trial performed best?" in frontend.text
     assert 'id="journey-panel"' in frontend.text
     assert "From dataset to final model decision" in frontend.text
-    assert "/assets/app.js?v=model-lab-49" in frontend.text
+    assert "/assets/app.js?v=model-lab-50" in frontend.text
     assert 'id="roc-chart" class="chart uci-chart chart-wide"' in frontend.text
     assert 'id="model-lab-chart" class="model-lab-chart-shell"' in frontend.text
     assert 'href="#tab-uci-button"' not in frontend.text
@@ -100,7 +100,6 @@ def test_health_and_static_frontend() -> None:
     assert app_script.status_code == 200
     assert "Plotly.newPlot" in app_script.text
     assert "function resizeCharts(scope)" in app_script.text
-    assert "Plotly.purge(node)" in app_script.text
     assert "function persistDataset(target)" in app_script.text
     assert 'searchParams.set("dataset"' in app_script.text
     assert 'xanchor:"center"' in app_script.text

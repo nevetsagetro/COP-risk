@@ -32,11 +32,7 @@ const plotConfig = {displayModeBar:false, scrollZoom:false, responsive:true};
 const originalNewPlot = Plotly.newPlot.bind(Plotly);
 const originalReact = Plotly.react.bind(Plotly);
 const themedLayout = (layout={}) => ({...chartTheme, ...layout, font:{...chartTheme.font, ...(layout.font||{})}, hoverlabel:{...chartTheme.hoverlabel, ...(layout.hoverlabel||{})}});
-Plotly.newPlot = (target, data, layout, config) => {
-  const node = typeof target === "string" ? document.getElementById(target) : target;
-  if (node?.classList.contains("js-plotly-plot")) Plotly.purge(node);
-  return originalNewPlot(target, data, themedLayout(layout), config);
-};
+Plotly.newPlot = (target, data, layout, config) => originalNewPlot(target, data, themedLayout(layout), config);
 Plotly.react = (target, data, layout, config) => originalReact(target, data, themedLayout(layout), config);
 const MODEL_LAB_SESSION_KEY = "cop-model-lab-session-v1";
 const api = async (path, options={}) => { const response = await fetch(path, options); if (!response.ok) throw new Error(await response.text()); return response.json(); };
