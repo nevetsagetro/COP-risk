@@ -23,7 +23,7 @@ const chartColors = {
 };
 const chartTheme = {
   paper_bgcolor: "transparent",
-  plot_bgcolor: "#ffffff",
+  plot_bgcolor: "transparent",
   font: {family: "Inter, ui-sans-serif, system-ui, sans-serif", color: "#172033", size: 12},
   hoverlabel: {bgcolor: "#ffffff", bordercolor: "#cbd5e1", font: {color: "#172033", size: 12}},
   colorway: [chartColors.logistic_regression, chartColors.lightgbm, chartColors.mlp, chartColors.reference]

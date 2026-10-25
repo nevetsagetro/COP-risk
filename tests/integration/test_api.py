@@ -87,7 +87,7 @@ def test_health_and_static_frontend() -> None:
     assert "Which trial performed best?" in frontend.text
     assert 'id="journey-panel"' in frontend.text
     assert "From dataset to final model decision" in frontend.text
-    assert "/assets/app.js?v=model-lab-32" in frontend.text
+    assert "/assets/app.js?v=model-lab-33" in frontend.text
     assert 'id="home-iteration-result"' in frontend.text
     assert "/assets/language.js?v=toggle-5" in frontend.text
     app_script = request("GET", "/assets/app.js?v=model-lab-5")
