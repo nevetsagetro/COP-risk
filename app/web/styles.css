@@ -124,10 +124,11 @@ th small { color:var(--blue); font-size:.68rem; text-transform:none; letter-spac
 #model-lab-table td:nth-child(3) { white-space:normal; min-width:220px; }
 #model-lab-table td:nth-child(5) { color:var(--muted); }
 #home-credit-table td:nth-child(2) { white-space:normal; min-width:150px; }
-.chart { min-height:390px; width:100%; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+.chart { display:flex; justify-content:center; align-items:stretch; min-height:390px; width:100%; margin-inline:auto; overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#fbfcfe; }
+.chart > .plotly-graph-div { flex:1 1 auto; width:100% !important; min-width:0; margin-inline:auto; }
 .chart-grid { display:grid; gap:14px; }
 .chart-grid.two-models { grid-template-columns:1fr; }
-.chart-card { min-width:0; border:1px solid var(--line); border-radius:14px; background:#fbfcfe; padding:12px 12px 0; }
+.chart-card { display:flex; flex-direction:column; align-items:stretch; min-width:0; border:1px solid var(--line); border-radius:14px; background:#fbfcfe; padding:12px 12px 0; }
 .chart-card h3 { padding:4px 8px 0; }
 .chart-card p { color:var(--muted); padding:0 8px; font-size:.84rem; }
 .chart.compact { min-height:330px; }
