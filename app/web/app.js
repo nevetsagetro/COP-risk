@@ -125,7 +125,6 @@ function renderHomeCredit(data) {
   document.querySelector("#home-credit-limitation").textContent=`${data.note} ${data.limitation}`;
 }
 let homeEdaLoaded = false;
-function edaValue(value) { return value === null || value === undefined || !Number.isFinite(Number(value)) ? "—" : Number(value).toLocaleString(document.documentElement.lang, {maximumFractionDigits:3}); }
 function renderHomeEda(data) {
   const status = document.querySelector("#home-eda-status");
   status.textContent = "Cached EDA loaded · train analysis · test unopened";
