@@ -81,6 +81,18 @@ This is the model-development story. It explains:
 
 Home Credit results are materialized offline under `runs/`. The browser only presents those cached JSON/CSV artifacts.
 
+The optional Data Audit / EDA tab is also cache-backed. Materialize it before
+opening the tab:
+
+```bash
+python3 scripts/run_home_credit_eda.py
+```
+
+It reports target prevalence, train-split missingness, selected feature
+contrasts by target, Pearson correlations for a documented numeric subset, and
+the audit-only boundary. It is descriptive evidence, not feature importance,
+causal analysis, or a live computation.
+
 ### UCI Reference Baseline
 
 This is the original academic baseline. It uses the 19 frozen UCI variables and compares Logistic Regression with LightGBM. The final test remains closed unless explicitly finalized through the documented CLI.

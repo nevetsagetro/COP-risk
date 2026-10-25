@@ -1,0 +1,156 @@
+workflow_version: 1
+workflow_id: home-credit-eda-tab
+language: en
+project: COP Home Credit EDA and Data Audit Tab
+objective: >-
+  Add an independent offline-first EDA tab for Home Credit that exposes
+  descriptive data-audit evidence without changing the existing scrollytelling,
+  UCI reference lab, model calculations, or test boundary.
+status: proposed
+waves:
+  - id: wave-01-eda-contract
+    name: EDA evidence contract
+    purpose: Define populations, variables, methods, and limitations before implementation.
+    exit_criteria:
+      - Every output records its source population, split, method, and limitation.
+      - Correlation subset and selection rule are documented.
+      - Test, audit-only, and frontend-data boundaries are explicit.
+    tasks:
+      - id: HC35-001
+        title: Audit Home Credit EDA-capable artifacts
+        agent: data_ml
+        depends_on: []
+        allowed_paths: [docs/plans/, docs/datasets/, runs/]
+        prohibited_paths: [app/web/, src/cop/api.py, src/cop/training/]
+        status: complete_pending_review
+      - id: HC35-002
+        title: Define the cached EDA schema and statistical methods
+        agent: data_ml
+        depends_on: [HC35-001]
+        allowed_paths: [docs/plans/, docs/datasets/, docs/decisions/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: complete_pending_review
+      - id: HC35-003
+        title: Review EDA claims and dataset boundaries
+        agent: reviewer
+        depends_on: [HC35-001, HC35-002]
+        allowed_paths: [docs/]
+        prohibited_paths: [data/, runs/, app/web/, .git/]
+        status: proposed
+  - id: wave-02-offline-eda
+    name: Offline EDA materialization
+    purpose: Generate deterministic, cached descriptive evidence from Home Credit.
+    exit_criteria:
+      - The job is deterministic and idempotent.
+      - Artifacts contain no raw rows or prohibited attributes.
+      - Prevalence, missingness, distributions, and correlations are tested.
+    tasks:
+      - id: HC35-004
+        title: Implement the Home Credit EDA report job
+        agent: data_ml
+        depends_on: [HC35-003]
+        allowed_paths: [src/cop/evaluation/, scripts/, tests/unit/, docs/plans/]
+        prohibited_paths: [app/web/, src/cop/api.py, data/, runs/]
+        status: complete_pending_review
+      - id: HC35-005
+        title: Add deterministic EDA artifact and leakage-boundary tests
+        agent: data_ml
+        depends_on: [HC35-004]
+        allowed_paths: [src/cop/evaluation/, scripts/, tests/]
+        prohibited_paths: [app/web/, data/, runs/]
+        status: complete_pending_review
+      - id: HC35-006
+        title: Review generated EDA evidence
+        agent: reviewer
+        depends_on: [HC35-004, HC35-005]
+        allowed_paths: [docs/, src/cop/evaluation/, tests/]
+        prohibited_paths: [data/, runs/, app/web/, .git/]
+        status: proposed
+  - id: wave-03-eda-api
+    name: Read-only EDA API
+    purpose: Serve cached EDA evidence without changing existing contracts.
+    exit_criteria:
+      - A versioned endpoint serves the report.
+      - Existing Home Credit and UCI endpoints remain compatible.
+      - API tests prove test closure and path safety.
+    tasks:
+      - id: HC35-007
+        title: Add the Home Credit EDA read-only service contract
+        agent: mlops
+        depends_on: [HC35-006]
+        allowed_paths: [src/cop/serving/, src/cop/api.py, tests/integration/]
+        prohibited_paths: [data/, src/cop/training/, app/web/]
+        status: complete_pending_review
+      - id: HC35-008
+        title: Add endpoint, artifact, and backward-compatibility tests
+        agent: mlops
+        depends_on: [HC35-007]
+        allowed_paths: [src/cop/serving/, src/cop/api.py, tests/]
+        prohibited_paths: [data/, runs/, app/web/]
+        status: complete_pending_review
+      - id: HC35-009
+        title: Review API and artifact isolation
+        agent: reviewer
+        depends_on: [HC35-007, HC35-008]
+        allowed_paths: [docs/, src/cop/serving/, tests/]
+        prohibited_paths: [data/, runs/, app/web/, .git/]
+        status: proposed
+  - id: wave-04-independent-frontend
+    name: Independent EDA tab and visual interpretation
+    purpose: Present cached data-audit evidence without interfering with scrollytelling.
+    exit_criteria:
+      - The EDA tab is scoped to Home Credit and does not mix UCI content.
+      - Charts include exact-value access, text interpretation, and unavailable states.
+      - Existing story and chart behavior has no regression.
+      - Responsive, keyboard, reduced-motion, and English UI checks pass.
+    tasks:
+      - id: HC35-010
+        title: Add the independent Home Credit EDA tab shell
+        agent: coordinator
+        depends_on: [HC35-009]
+        allowed_paths: [app/web/index.html, app/web/styles.css, tests/integration/]
+        prohibited_paths: [src/cop/training/, data/, runs/]
+        status: complete_pending_review
+      - id: HC35-011
+        title: Implement cached EDA summaries and charts
+        agent: coordinator
+        depends_on: [HC35-010]
+        allowed_paths: [app/web/app.js, app/web/styles.css, tests/integration/]
+        prohibited_paths: [src/cop/training/, data/, runs/]
+        status: complete_pending_review
+      - id: HC35-012
+        title: Review EDA UX, accessibility, and dataset separation
+        agent: reviewer
+        depends_on: [HC35-010, HC35-011]
+        allowed_paths: [app/web/, tests/, docs/]
+        prohibited_paths: [data/, runs/, .git/]
+        status: proposed
+  - id: wave-05-closure
+    name: Regression validation and milestone closure
+    purpose: Close the EDA tab without changing the existing model-development story.
+    exit_criteria:
+      - Fixed tests, formatting, linting, typing, and diff checks pass.
+      - Existing scrollytelling and UCI regression checks remain green.
+      - Read-only review and milestone finisher complete.
+    tasks:
+      - id: HC35-013
+        title: Run full EDA and frontend regression validation
+        agent: coordinator
+        depends_on: [HC35-012]
+        allowed_paths: [tests/, docs/plans/, docs/workflows/]
+        prohibited_paths: [data/, runs/, .git/]
+        status: proposed
+      - id: HC35-014
+        title: Perform final read-only review
+        agent: reviewer
+        depends_on: [HC35-013]
+        allowed_paths: [docs/, src/, app/, tests/]
+        prohibited_paths: [data/, runs/, .git/]
+        status: proposed
+      - id: HC35-015
+        title: Validate the allowlist and prepare milestone closure
+        agent: milestone_finisher
+        depends_on: [HC35-014]
+        allowed_paths: [docs/plans/, docs/workflows/, scripts/finish_milestone.py]
+        prohibited_paths: [data/, runs/, models/, .git/]
+        status: proposed

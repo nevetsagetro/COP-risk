@@ -160,6 +160,14 @@ async def home_credit_academic() -> dict[str, Any]:
         raise HTTPException(status_code=503, detail=str(error)) from error
 
 
+@app.get("/api/home-credit/eda")
+async def home_credit_eda() -> dict[str, Any]:
+    try:
+        return get_home_credit_service().eda_report()
+    except (FileNotFoundError, KeyError, ValueError) as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+
+
 @app.get("/api/policy-capacity")
 async def policy_capacity(
     capacity: float = Query(

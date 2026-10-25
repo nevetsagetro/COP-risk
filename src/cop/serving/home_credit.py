@@ -94,6 +94,15 @@ class HomeCreditService:
             ),
         }
 
+    def eda_report(self) -> dict[str, Any]:
+        """Expose the cached EDA report without inspecting data at request time."""
+        report_path = self._run_directory.parent / "eda-report.json"
+        if not report_path.exists():
+            raise FileNotFoundError(
+                "The Home Credit EDA report has not been materialized"
+            )
+        return _json(report_path)
+
     def academic_evidence(self) -> dict[str, Any]:
         """Expose the cached evidence chain used by the Home Credit story."""
         manifest = _json(self._snapshot_directory / "manifest.json")
