@@ -188,7 +188,6 @@ function setupDatasetTabs() {
     if (target === "tab-uci") loadUciReference();
     requestAnimationFrame(() => document.querySelectorAll(`#${target} .js-plotly-plot`).forEach(chart => Plotly.Plots.resize(chart)));
   }));
-  document.querySelectorAll('.jump-links a[href="#tab-uci-button"]').forEach(link => link.addEventListener("click", event => { event.preventDefault(); document.querySelector("#tab-uci-button").click(); }));
 }
 function readModelLabSession() {
   try {
