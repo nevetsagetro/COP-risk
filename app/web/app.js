@@ -26,13 +26,12 @@ const chartTheme = {
   plot_bgcolor: "transparent",
   font: {family: "Inter, ui-sans-serif, system-ui, sans-serif", color: "#172033", size: 12},
   hoverlabel: {bgcolor: "#ffffff", bordercolor: "#cbd5e1", font: {color: "#172033", size: 12}},
-  legend: {orientation: "h", x: .5, xanchor: "center", y: -.25, yanchor: "top"},
   colorway: [chartColors.logistic_regression, chartColors.lightgbm, chartColors.mlp, chartColors.reference]
 };
 const plotConfig = {displayModeBar:false, scrollZoom:false, responsive:true};
 const originalNewPlot = Plotly.newPlot.bind(Plotly);
 const originalReact = Plotly.react.bind(Plotly);
-const themedLayout = (layout={}) => ({...chartTheme, ...layout, font:{...chartTheme.font, ...(layout.font||{})}, hoverlabel:{...chartTheme.hoverlabel, ...(layout.hoverlabel||{})}, legend:{...chartTheme.legend, ...(layout.legend||{})}});
+const themedLayout = (layout={}) => ({...chartTheme, ...layout, font:{...chartTheme.font, ...(layout.font||{})}, hoverlabel:{...chartTheme.hoverlabel, ...(layout.hoverlabel||{})}});
 Plotly.newPlot = (target, data, layout, config) => originalNewPlot(target, data, themedLayout(layout), config);
 Plotly.react = (target, data, layout, config) => originalReact(target, data, themedLayout(layout), config);
 const MODEL_LAB_SESSION_KEY = "cop-model-lab-session-v1";
